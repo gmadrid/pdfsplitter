@@ -10,6 +10,15 @@ import Cocoa
 import CoreGraphics
 import CoreImage
 
+enum VCError : Error {
+  case CouldntOpenPdfToRead(url: URL)
+  case FailedToCreateGraphicsContext
+  case FailedToCropImage
+  case FailedToOpenPage(pageNum: Int)
+  case FailedToRenderImage
+  case NoCurrentDocument
+}
+
 class ViewController: NSViewController {
   @IBOutlet var filenameField: NSTextField!
   @IBOutlet var pageNumberField: NSTextField!
@@ -52,7 +61,11 @@ class ViewController: NSViewController {
       guard let url = dialog.url else {
         return
       }
-      openFile(url)
+      do {
+        try openFile(url)
+      } catch {
+        // DO SOMETHING HERE TODO !!! XXX
+      }
     } else {
       // User clicked "Cancel"
       return
@@ -65,7 +78,11 @@ class ViewController: NSViewController {
     }
     
     if page.pageNumber < doc.numberOfPages {
-      gotoPage(page.pageNumber + 1)
+      do {
+        try gotoPage(page.pageNumber + 1)
+      } catch {
+        // XXX ERR
+      }
     }
   }
   
@@ -75,7 +92,11 @@ class ViewController: NSViewController {
     }
     
     if page.pageNumber > 1 {
-      gotoPage(page.pageNumber - 1)
+      do {
+        try gotoPage(page.pageNumber - 1)
+      } catch {
+        // XXX ERR
+      }
     }
   }
   
@@ -98,16 +119,12 @@ class ViewController: NSViewController {
     guard let url = dialog.url else {
       return
     }
-    
-    
-    
-    splitCurrentDocument(url)
+
+    try! splitCurrentDocument(url)
   }
   
-  func splitCurrentDocument(_ destUrl: URL) {
-    guard let doc = document else {
-      return
-    }
+  func splitCurrentDocument(_ destUrl: URL) throws {
+    let doc = try checkForCurrentDocument()
     
     guard let firstPage = doc.page(at: 1) else {
       return
@@ -120,25 +137,12 @@ class ViewController: NSViewController {
     }
 
     for pageNum in 1...doc.numberOfPages {
-      guard let page = doc.page(at: pageNum) else {
-        print("Failed to load page: ", pageNum)
-        return
-      }
+      let page = try getPageFromDocument(pageNum, fromDoc: doc)
       
-      guard let image = imageForPage(page) else {
-        print("Failed to get image for page", pageNum)
-        return
-      }
-      guard let leftImage = leftImageForImage(image) else {
-        print("Failed to get left image for page", pageNum)
-        return
-      }
+      let image = try imageForPage(page)
+      let leftImage = try leftImageForImage(image)
+      let rightImage = try rightImageForImage(image)
       
-      guard let rightImage = rightImageForImage(image) else {
-        print("Failed to get right image for page", pageNum)
-        return
-      }
-     
       let leftPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: leftImage.width, height: leftImage.height))
       let leftPageDict: [String:Any] = [
         kCGPDFContextMediaBox as String: leftPageRect
@@ -157,21 +161,20 @@ class ViewController: NSViewController {
     }
   }
   
-  func openFile(_ fileURL: URL) {
+  func openFile(_ fileURL: URL) throws {
     closeFile();
     
     pdfUrl = fileURL
     filenameField.stringValue = fileURL.path
     
     guard let doc = CGPDFDocument(fileURL as CFURL) else {
-      NSLog("Failed to open pdf.");
-      return
+      throw VCError.CouldntOpenPdfToRead(url: fileURL)
     }
     
     document = doc
     numberOfPages = doc.numberOfPages
     
-    gotoPage(1)
+    try gotoPage(1)
   }
   
   func closeFile() {
@@ -182,63 +185,78 @@ class ViewController: NSViewController {
     document = nil
   }
   
-  func gotoPage(_ pageNum: size_t) {
+  func checkForCurrentDocument() throws -> CGPDFDocument {
     guard let doc = document else {
-      return
+      throw VCError.NoCurrentDocument
     }
+    return doc
+  }
+  
+  func getPageFromDocument(_ pageNum: Int, fromDoc doc: CGPDFDocument) throws -> CGPDFPage {
     guard let page = doc.page(at: pageNum) else {
-      NSLog("Couldn't open page.")
-      return
+      throw VCError.FailedToOpenPage(pageNum: pageNum)
     }
+    return page
+  }
+  
+  func gotoPage(_ pageNum: size_t) throws {
+    let doc = try checkForCurrentDocument()
+    let page = try getPageFromDocument(pageNum, fromDoc: doc)
     
     let pageDisplay = String(format: "Page %d of %d", pageNum, doc.numberOfPages)
     pageNumberField.stringValue = pageDisplay
     
     currentPage = page;
-    let image = imageForPage(page)
-    if let cgimage = image {
+    do {
+      let cgimage = try imageForPage(page)
       originalImageView.image = NSImage(cgImage: cgimage, size: CGSize(width: cgimage.width, height: cgimage.height))
-
-      if let leftImage = leftImageForImage(cgimage) {
-        leftImageView.image = NSImage(cgImage: leftImage, size: CGSize(width: leftImage.width, height: leftImage.height))
-      } else {
-        leftImageView.image = nil
-      }
       
-      if let rightImage = rightImageForImage(cgimage) {
+      do {
+        let leftImage = try leftImageForImage(cgimage)
+        leftImageView.image = NSImage(cgImage: leftImage, size: CGSize(width: leftImage.width, height: leftImage.height))
+        let rightImage = try rightImageForImage(cgimage)
         rightImageView.image = NSImage(cgImage: rightImage, size: CGSize(width: rightImage.width, height: rightImage.height))
-      } else {
+      } catch {
+        leftImageView.image = nil
         rightImageView.image = nil
       }
+    } catch {
+      originalImageView.image = nil
+      leftImageView.image = nil
+      rightImageView.image = nil
     }
   }
   
-  func imageForPage(_ page: CGPDFPage) -> CGImage? {
+  func imageForPage(_ page: CGPDFPage) throws -> CGImage {
     let mediaBox = page.getBoxRect(.mediaBox)
     let destBox = CGRect(origin: CGPoint.zero, size: CGSize(width: mediaBox.size.width * 1, height: mediaBox.size.height * 1))
     
     guard let context = CGContext(data: nil, width: Int(destBox.size.width), height: Int(destBox.size.height), bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpace(name: CGColorSpace.genericRGBLinear)!, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue) else {
-      print("Could not create graphics context")
-      return nil
+      throw VCError.FailedToCreateGraphicsContext
     }
     
     context.drawPDFPage(page)
     
     guard let cgimage = context.makeImage() else {
-      print("Could not draw image")
-      return nil
+      throw VCError.FailedToRenderImage
     }
     return cgimage
   }
   
-  func leftImageForImage(_ image: CGImage) -> CGImage? {
+  func leftImageForImage(_ image: CGImage) throws -> CGImage {
     let rect = CGRect(x: 0, y: 0, width: image.width / 2, height: image.height)
-    return image.cropping(to: rect)
+    guard let result = image.cropping(to: rect) else {
+      throw VCError.FailedToCropImage
+    }
+    return result
   }
   
-  func rightImageForImage(_ image: CGImage) -> CGImage? {
+  func rightImageForImage(_ image: CGImage) throws -> CGImage {
     let rect = CGRect(x: image.width / 2, y: 0, width: image.width / 2, height: image.height)
-    return image.cropping(to: rect)
+    guard let result = image.cropping(to: rect) else {
+      throw VCError.FailedToCropImage
+    }
+    return result
   }
 }
 
