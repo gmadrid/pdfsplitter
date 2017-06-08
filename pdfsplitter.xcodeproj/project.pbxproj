@@ -13,9 +13,11 @@
 		C77DEA6D1EE7418400A5B714 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77DEA6C1EE7418400A5B714 /* ViewController.swift */; };
 		C77DEA6F1EE7418400A5B714 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C77DEA6E1EE7418400A5B714 /* Assets.xcassets */; };
 		C77DEA721EE7418400A5B714 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C77DEA701EE7418400A5B714 /* Main.storyboard */; };
+		DAA804C204FF33B74BA0CB97 /* Pods_pdfsplitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137E8346E8F071387A90D50 /* Pods_pdfsplitter.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1137E8346E8F071387A90D50 /* Pods_pdfsplitter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_pdfsplitter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C73135EA1EE98DC4006FAE15 /* NOTES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
 		C73135EC1EE98FD8006FAE15 /* PDFSplitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PDFSplitter.swift; sourceTree = "<group>"; };
 		C77DEA671EE7418400A5B714 /* pdfsplitter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pdfsplitter.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -24,6 +26,8 @@
 		C77DEA6E1EE7418400A5B714 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C77DEA711EE7418400A5B714 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C77DEA731EE7418400A5B714 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CAA528DDFCCBE39CE29582EF /* Pods-pdfsplitter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdfsplitter.release.xcconfig"; path = "Pods/Target Support Files/Pods-pdfsplitter/Pods-pdfsplitter.release.xcconfig"; sourceTree = "<group>"; };
+		CC6EEFEE115FB216C0361367 /* Pods-pdfsplitter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdfsplitter.debug.xcconfig"; path = "Pods/Target Support Files/Pods-pdfsplitter/Pods-pdfsplitter.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,18 +35,38 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAA804C204FF33B74BA0CB97 /* Pods_pdfsplitter.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		56E04DD8E58F391BD1452D26 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1137E8346E8F071387A90D50 /* Pods_pdfsplitter.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B458B1D45D5B43903B3EBDCE /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				CC6EEFEE115FB216C0361367 /* Pods-pdfsplitter.debug.xcconfig */,
+				CAA528DDFCCBE39CE29582EF /* Pods-pdfsplitter.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		C77DEA5E1EE7418400A5B714 = {
 			isa = PBXGroup;
 			children = (
 				C73135EA1EE98DC4006FAE15 /* NOTES */,
 				C77DEA691EE7418400A5B714 /* pdfsplitter */,
 				C77DEA681EE7418400A5B714 /* Products */,
+				B458B1D45D5B43903B3EBDCE /* Pods */,
+				56E04DD8E58F391BD1452D26 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -74,9 +98,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C77DEA761EE7418400A5B714 /* Build configuration list for PBXNativeTarget "pdfsplitter" */;
 			buildPhases = (
+				5863EF4214A5FE3D409B5473 /* [CP] Check Pods Manifest.lock */,
 				C77DEA631EE7418400A5B714 /* Sources */,
 				C77DEA641EE7418400A5B714 /* Frameworks */,
 				C77DEA651EE7418400A5B714 /* Resources */,
+				4D2EF5BA524C83FCFA58C90B /* [CP] Embed Pods Frameworks */,
+				C104468AE43ECF48FE7F2A5E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -133,6 +160,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4D2EF5BA524C83FCFA58C90B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-pdfsplitter/Pods-pdfsplitter-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5863EF4214A5FE3D409B5473 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		C104468AE43ECF48FE7F2A5E /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-pdfsplitter/Pods-pdfsplitter-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		C77DEA631EE7418400A5B714 /* Sources */ = {
@@ -253,6 +328,7 @@
 		};
 		C77DEA771EE7418400A5B714 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC6EEFEE115FB216C0361367 /* Pods-pdfsplitter.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -266,6 +342,7 @@
 		};
 		C77DEA781EE7418400A5B714 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CAA528DDFCCBE39CE29582EF /* Pods-pdfsplitter.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
