@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C73135EB1EE98DC4006FAE15 /* NOTES in Resources */ = {isa = PBXBuildFile; fileRef = C73135EA1EE98DC4006FAE15 /* NOTES */; };
+		C73135ED1EE98FD8006FAE15 /* PDFSplitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73135EC1EE98FD8006FAE15 /* PDFSplitter.swift */; };
 		C77DEA6B1EE7418400A5B714 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77DEA6A1EE7418400A5B714 /* AppDelegate.swift */; };
 		C77DEA6D1EE7418400A5B714 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77DEA6C1EE7418400A5B714 /* ViewController.swift */; };
 		C77DEA6F1EE7418400A5B714 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C77DEA6E1EE7418400A5B714 /* Assets.xcassets */; };
@@ -16,6 +17,7 @@
 
 /* Begin PBXFileReference section */
 		C73135EA1EE98DC4006FAE15 /* NOTES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
+		C73135EC1EE98FD8006FAE15 /* PDFSplitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PDFSplitter.swift; sourceTree = "<group>"; };
 		C77DEA671EE7418400A5B714 /* pdfsplitter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pdfsplitter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C77DEA6A1EE7418400A5B714 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C77DEA6C1EE7418400A5B714 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -57,6 +59,7 @@
 			children = (
 				C77DEA6A1EE7418400A5B714 /* AppDelegate.swift */,
 				C77DEA6C1EE7418400A5B714 /* ViewController.swift */,
+				C73135EC1EE98FD8006FAE15 /* PDFSplitter.swift */,
 				C77DEA6E1EE7418400A5B714 /* Assets.xcassets */,
 				C77DEA701EE7418400A5B714 /* Main.storyboard */,
 				C77DEA731EE7418400A5B714 /* Info.plist */,
@@ -137,6 +140,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C77DEA6D1EE7418400A5B714 /* ViewController.swift in Sources */,
+				C73135ED1EE98FD8006FAE15 /* PDFSplitter.swift in Sources */,
 				C77DEA6B1EE7418400A5B714 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -3,5 +3,8 @@
 * Create slider to change pages
 * Have progress bar for processing
 
+* Move all of the pdf handling out of the VC
+
 * Detect center of page
 * Figure out what to do with pages like Sonata page 30.
+

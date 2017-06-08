@@ -17,6 +17,7 @@ enum VCError : Error {
   case FailedToOpenPage(pageNum: Int)
   case FailedToRenderImage
   case NoCurrentDocument
+  case PageOutOfRange(pageNum: Int)
 }
 
 class ViewController: NSViewController {
@@ -26,13 +27,16 @@ class ViewController: NSViewController {
   @IBOutlet var leftImageView: NSImageView!
   @IBOutlet var rightImageView: NSImageView!
   
+  var splitter: PDFSplitter? {
+    didSet {
+      if splitter != nil {
+        try! updatePage()
+      }
+    }
+  }
+  
   var pdfUrl: URL?
 
-  var document: CGPDFDocument?
-  var numberOfPages: size_t = 0
-  
-  var currentPage: CGPDFPage?
-  
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -59,6 +63,7 @@ class ViewController: NSViewController {
   
     if (dialog.runModal() == NSModalResponseOK) {
       guard let url = dialog.url else {
+        // !!! ERR XXX
         return
       }
       do {
@@ -73,93 +78,87 @@ class ViewController: NSViewController {
   }
   
   @IBAction func nextPagePushed(sender: NSButton) {
-    guard let doc = document, let page = currentPage else {
-      return
-    }
-    
-    if page.pageNumber < doc.numberOfPages {
-      do {
-        try gotoPage(page.pageNumber + 1)
-      } catch {
-        // XXX ERR
-      }
+    // You should probably do something more graceful than throwing here.
+    // At least disable the button.
+    do {
+      let s = try requireSplitter()
+      try s.gotoPage(s.pageNumber + 1)
+      try updatePage()
+    } catch {
+      // XXX ERR
     }
   }
   
   @IBAction func prevPagePushed(sender: NSButton) {
-    guard let page = currentPage else {
-      return
-    }
-    
-    if page.pageNumber > 1 {
-      do {
-        try gotoPage(page.pageNumber - 1)
-      } catch {
-        // XXX ERR
-      }
+    do {
+      let s = try requireSplitter()
+      try s.gotoPage(s.pageNumber - 1)
+      try updatePage()
+    } catch {
+      // XXX ERR
     }
   }
   
   @IBAction func splitPushed(sender: NSButton) {
-    guard document != nil else {
-      return
-    }
-
-    let dialog = NSSavePanel()
-    dialog.title = "Save the .pdf file"
-    dialog.showsResizeIndicator = true
-    dialog.showsHiddenFiles = false
-    dialog.canCreateDirectories = true
-    dialog.allowedFileTypes = ["pdf"]
-    
-    if dialog.runModal() != NSModalResponseOK {
-      return
-    }
-    
-    guard let url = dialog.url else {
-      return
-    }
-
-    try! splitCurrentDocument(url)
+//    guard document != nil else {
+//      return
+//    }
+//
+//    let dialog = NSSavePanel()
+//    dialog.title = "Save the .pdf file"
+//    dialog.showsResizeIndicator = true
+//    dialog.showsHiddenFiles = false
+//    dialog.canCreateDirectories = true
+//    dialog.allowedFileTypes = ["pdf"]
+//    
+//    if dialog.runModal() != NSModalResponseOK {
+//      return
+//    }
+//    
+//    guard let url = dialog.url else {
+//      return
+//    }
+//
+//    try! splitCurrentDocument(url)
   }
   
-  func splitCurrentDocument(_ destUrl: URL) throws {
-    let doc = try checkForCurrentDocument()
-    
-    guard let firstPage = doc.page(at: 1) else {
-      return
-    }
-    let mediaBox = firstPage.getBoxRect(.mediaBox)
-    var docBox = CGRect(origin: mediaBox.origin, size: CGSize(width: mediaBox.size.width / 2, height: mediaBox.size.height))
-
-    guard let context = CGContext(destUrl as CFURL, mediaBox: &docBox, nil) else {
-      return
-    }
-
-    for pageNum in 1...doc.numberOfPages {
-      let page = try getPageFromDocument(pageNum, fromDoc: doc)
-      
-      let image = try imageForPage(page)
-      let leftImage = try leftImageForImage(image)
-      let rightImage = try rightImageForImage(image)
-      
-      let leftPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: leftImage.width, height: leftImage.height))
-      let leftPageDict: [String:Any] = [
-        kCGPDFContextMediaBox as String: leftPageRect
-      ]
-      context.beginPDFPage(leftPageDict as CFDictionary)
-      context.draw(leftImage, in: leftPageRect)
-      context.endPage()
-      
-      let rightPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: rightImage.width, height: rightImage.height))
-      let rightPageDict: [String:Any] = [
-        kCGPDFContextMediaBox as String: rightPageRect
-      ]
-      context.beginPDFPage(rightPageDict as CFDictionary)
-      context.draw(rightImage, in: rightPageRect)
-      context.endPage()
-    }
-  }
+//  func splitCurrentDocument(_ destUrl: URL) throws {
+//    let doc = try checkForCurrentDocument()
+//    
+//    guard let firstPage = doc.page(at: 1) else {
+//      return
+//    }
+//    let mediaBox = firstPage.getBoxRect(.mediaBox)
+//    var docBox = CGRect(origin: mediaBox.origin, size: CGSize(width: mediaBox.size.width / 2, height: mediaBox.size.height))
+//
+//    guard let context = CGContext(destUrl as CFURL, mediaBox: &docBox, nil) else {
+//      return
+//    }
+//
+//    for pageNum in 1...doc.numberOfPages {
+//      let page = try getPageFromDocument(pageNum, fromDoc: doc)
+//      
+//      let image = try imageForPage(page)
+//      let leftImage = try leftImageForImage(image)
+//      let rightImage = try rightImageForImage(image)
+//      
+//      let leftPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: leftImage.width, height: leftImage.height))
+//      let leftPageDict: [String:Any] = [
+//        kCGPDFContextMediaBox as String: leftPageRect
+//      ]
+//      context.beginPDFPage(leftPageDict as CFDictionary)
+//      context.draw(leftImage, in: leftPageRect)
+//      context.endPage()
+//      
+//      let rightPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: rightImage.width, height: rightImage.height))
+//      let rightPageDict: [String:Any] = [
+//        kCGPDFContextMediaBox as String: rightPageRect
+//      ]
+//      context.beginPDFPage(rightPageDict as CFDictionary)
+//      context.draw(rightImage, in: rightPageRect)
+//      context.endPage()
+//    }
+//  }
   
   func openFile(_ fileURL: URL) throws {
     closeFile();
@@ -167,29 +166,23 @@ class ViewController: NSViewController {
     pdfUrl = fileURL
     filenameField.stringValue = fileURL.path
     
-    guard let doc = CGPDFDocument(fileURL as CFURL) else {
-      throw VCError.CouldntOpenPdfToRead(url: fileURL)
-    }
-    
-    document = doc
-    numberOfPages = doc.numberOfPages
-    
-    try gotoPage(1)
+    splitter = try PDFSplitter(url: fileURL)
   }
   
   func closeFile() {
     pdfUrl = nil
     filenameField.stringValue = ""
-    numberOfPages = 0
-    currentPage = nil
-    document = nil
+    originalImageView.image = nil
+    leftImageView.image = nil
+    rightImageView.image = nil
+    splitter = nil
   }
   
-  func checkForCurrentDocument() throws -> CGPDFDocument {
-    guard let doc = document else {
+  func requireSplitter() throws -> PDFSplitter {
+    guard let s = splitter else {
       throw VCError.NoCurrentDocument
     }
-    return doc
+    return s
   }
   
   func getPageFromDocument(_ pageNum: Int, fromDoc doc: CGPDFDocument) throws -> CGPDFPage {
@@ -199,32 +192,25 @@ class ViewController: NSViewController {
     return page
   }
   
-  func gotoPage(_ pageNum: size_t) throws {
-    let doc = try checkForCurrentDocument()
-    let page = try getPageFromDocument(pageNum, fromDoc: doc)
+  func imageForCGImage(cgimage: CGImage) -> NSImage? {
+    return NSImage(cgImage: cgimage, size: CGSize(width: cgimage.width, height: cgimage.height))
+  }
+  
+  func updatePage() throws {
+    let doc = try requireSplitter()
     
-    let pageDisplay = String(format: "Page %d of %d", pageNum, doc.numberOfPages)
+    let pageDisplay = String(format: "Page %d of %d", doc.pageNumber, doc.numberOfPages)
     pageNumberField.stringValue = pageDisplay
     
-    currentPage = page;
-    do {
-      let cgimage = try imageForPage(page)
-      originalImageView.image = NSImage(cgImage: cgimage, size: CGSize(width: cgimage.width, height: cgimage.height))
-      
-      do {
-        let leftImage = try leftImageForImage(cgimage)
-        leftImageView.image = NSImage(cgImage: leftImage, size: CGSize(width: leftImage.width, height: leftImage.height))
-        let rightImage = try rightImageForImage(cgimage)
-        rightImageView.image = NSImage(cgImage: rightImage, size: CGSize(width: rightImage.width, height: rightImage.height))
-      } catch {
-        leftImageView.image = nil
-        rightImageView.image = nil
-      }
-    } catch {
-      originalImageView.image = nil
-      leftImageView.image = nil
-      rightImageView.image = nil
-    }
+    let page = doc.page
+    let cgimage = try imageForPage(page)
+    let leftImage = try leftImageForImage(cgimage)
+    let rightImage = try rightImageForImage(cgimage)
+    
+    // XXX TODO !!! error handling
+    originalImageView.image = imageForCGImage(cgimage: cgimage)
+    leftImageView.image = imageForCGImage(cgimage: leftImage)
+    rightImageView.image = imageForCGImage(cgimage: rightImage)
   }
   
   func imageForPage(_ page: CGPDFPage) throws -> CGImage {
