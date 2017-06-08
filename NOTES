@@ -1,0 +1,7 @@
+#### TODO
+* Move processing to other threads
+* Create slider to change pages
+* Have progress bar for processing
+
+* Detect center of page
+* Figure out what to do with pages like Sonata page 30.
