@@ -12,16 +12,13 @@ import RxSwift
 
 class PDFSplitter {
   // Sequence of images and page numbers for the current page.
-  var pageImage: BehaviorSubject<(CGImage?, Int?)> = BehaviorSubject(value: (nil, nil))
+  var pageImage: Observable<(CGImage?, Int?)>
+  var numberOfPages: Observable<Int>
   
   private let disposeBag = DisposeBag();
-
-  private let pdf: CGPDFDocument
-  private var page: BehaviorSubject<CGPDFPage>;
-  
-  var numberOfPages: Int {
-    get { return pdf.numberOfPages }
-  }
+  private let pdf: Observable<CGPDFDocument>
+  private let pageNumber: BehaviorSubject<Int>
+  private let page: Observable<CGPDFPage>
   
   convenience init(url: URL) throws {
     guard let document = CGPDFDocument(url as CFURL) else {
@@ -30,15 +27,24 @@ class PDFSplitter {
     try self.init(pdf: document)
   }
   
-  init(pdf: CGPDFDocument) throws {
-    self.pdf = pdf
-    page = BehaviorSubject(value: try PDFSplitter.readPage(at: 1, from:pdf))
-    page.asObservable().subscribe(onNext: { [weak self] p in
-      self?.pageOnNext(p)
-    }).disposed(by: disposeBag)
+  init(pdf document: CGPDFDocument) throws {
+    self.pdf = Observable.just(document).replay(1)
+    self.pageNumber = BehaviorSubject(value: 1)
+    self.numberOfPages = pdf.map({ return $0.numberOfPages })
+    
+    self.page = Observable.combineLatest(pdf, pageNumber)
+      .map { (pdf, pageNumber) in
+        print("MAPPING PAGE")
+        return try! PDFSplitter.readPage(at: pageNumber, from: pdf)
+    }
+    
+    self.pageImage = page.map({ page in
+      print("MAPPING PAGEIMAGE")
+        return (PDFSplitter.makeImageForPage(page), page.pageNumber)
+    }).startWith((nil, nil)).replay(1)
   }
   
-  private func pageOnNext(_ page: CGPDFPage) {
+  private static func makeImageForPage(_ page: CGPDFPage) -> CGImage? {
     let mediaBox = page.getBoxRect(.mediaBox)
     let destBox = CGRect(origin: CGPoint.zero, size: CGSize(width: mediaBox.size.width * 1, height: mediaBox.size.height * 1))
     
@@ -53,9 +59,9 @@ class PDFSplitter {
         throw VCError.FailedToRenderImage
       }
       
-      pageImage.onNext((cgimage, page.pageNumber))
+      return cgimage
     } catch {
-      pageImage.onNext((nil, nil))
+      return nil
     }
   }
   
@@ -67,17 +73,15 @@ class PDFSplitter {
   }
   
   func gotoPage(_ pageNum: Int) throws {
-    if pageNum < 1 || pageNum > pdf.numberOfPages {
-      throw VCError.PageOutOfRange(pageNum: pageNum)
-    }
-    page.onNext(try PDFSplitter.readPage(at: pageNum, from: pdf))
+    pageNumber.onNext(pageNum)
   }
   
   func nextPage() throws {
-    try gotoPage(page.value().pageNumber + 1)
+    print("NEXT PAGE")
+    try gotoPage(pageNumber.value() + 1)
   }
   
   func prevPage() throws {
-    try gotoPage(page.value().pageNumber - 1)
+    try gotoPage(pageNumber.value() - 1)
   }
 }

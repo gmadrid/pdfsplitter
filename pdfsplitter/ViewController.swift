@@ -34,9 +34,11 @@ class ViewController: NSViewController {
   
   var splitter: PDFSplitter? {
     didSet {
+      print("DID SET SPLITTER")
       guard let s = splitter else { return }
       
       s.pageImage.subscribe(onNext: { [weak self] (image, pageNumber) in
+        print("PAGEIMAGE ONNEXT")
         guard let _self = self, let image = image, let pageNumber = pageNumber else {
           self?.originalImageView.image = nil
           self?.leftImageView.image = nil
