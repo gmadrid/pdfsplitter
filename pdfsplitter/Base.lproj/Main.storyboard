@@ -802,6 +802,7 @@
                     <connections>
                         <outlet property="filenameField" destination="toG-RC-7JN" id="nbl-7t-DOJ"/>
                         <outlet property="leftImageView" destination="o3u-0x-f8w" id="ijo-pc-LT0"/>
+                        <outlet property="nextPageButton" destination="7HR-CJ-5v5" id="9id-Ab-xBB"/>
                         <outlet property="originalImageView" destination="bHO-Kk-v3i" id="YzS-ET-oE6"/>
                         <outlet property="pageNumberField" destination="5vn-WL-7fj" id="EfC-85-XjL"/>
                         <outlet property="rightImageView" destination="d9e-b8-CUA" id="MVg-Fd-cMp"/>

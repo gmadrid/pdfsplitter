@@ -6,6 +6,7 @@ target 'pdfsplitter' do
   use_frameworks!
 
   # Pods for pdfsplitter
-  pod 'ReactiveCocoa', '~> 5.0.0'
+  pod 'RxSwift', '~> 3.4'
+  pod 'RxCocoa', '~> 3.4'
   
 end
