@@ -14,12 +14,15 @@ import RxCocoa
 class PDFSplitter {
   /** Sequence of images and page numbers for the current page. */
   var pageDetailsS: Observable<(CGImage?, Int?)>
-  /** Sequence of total number of pages. */
-  var numberOfPagesS: Observable<Int>
   
+  /** Sequence of total number of pages. */
+  private var _numberOfPagesS = Variable<Int>(0)
+  
+  private let disposeBag = DisposeBag()
   private let pdfS: Observable<CGPDFDocument>
-  private let pageNumberS: BehaviorSubject<Int>
   private var pageS: Observable<CGPDFPage>
+  // TODO: As a pedagogical exercise, see if you can get rid of this variable.
+  private let pageNumberS: Variable<Int>
   
   convenience init(url: URL) throws {
     guard let document = CGPDFDocument(url as CFURL) else {
@@ -30,22 +33,29 @@ class PDFSplitter {
   
   init(pdf document: CGPDFDocument) throws {
     self.pdfS = Observable.just(document)
-    self.numberOfPagesS = pdfS.map { $0.numberOfPages }
+    pdfS.map { $0.numberOfPages }.bind(to: self._numberOfPagesS).disposed(by: disposeBag)
 
-    self.pageNumberS = BehaviorSubject(value: 1)
+    self.pageNumberS = Variable(1)
 
-    self.pageS = Observable.combineLatest(pdfS, pageNumberS) { p, pn in
-      return try! PDFSplitter.readPage(at: pn, from: p)
+    self.pageS = Observable.combineLatest(pdfS, _numberOfPagesS.asObservable(), pageNumberS.asObservable()) {
+      return ($0, $1, $2)
       }
+      .filter() { (pdf, numberOfPages, pageNumber) in
+        return 1...numberOfPages ~= pageNumber
+      }
+      .map() { (page, numberOfPages, pageNumber) in
+        return try PDFSplitter.readPage(at: pageNumber, from: page)
+    }
     
     self.pageDetailsS = pageS.map { page in
       return (PDFSplitter.makeImageForPage(page), page.pageNumber)
       }
+      .catchErrorJustReturn((nil, nil))
   }
   
   private static func makeImageForPage(_ page: CGPDFPage) -> CGImage? {
     let mediaBox = page.getBoxRect(.mediaBox)
-    let destBox = CGRect(origin: CGPoint.zero, size: CGSize(width: mediaBox.size.width * 1, height: mediaBox.size.height * 1))
+    let destBox = CGRect(origin: CGPoint.zero, size: mediaBox.size)
     
     do {
       guard let context = CGContext(data: nil, width: Int(destBox.size.width), height: Int(destBox.size.height), bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpace(name: CGColorSpace.genericRGBLinear)!, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue) else {
@@ -71,15 +81,13 @@ class PDFSplitter {
     return result
   }
   
-  func gotoPage(_ pageNum: Int) throws {
-    pageNumberS.onNext(pageNum)
+  func nextPage() {
+    guard pageNumberS.value < _numberOfPagesS.value else { return }
+    pageNumberS.value = pageNumberS.value + 1
   }
   
-  func nextPage() throws {
-    try gotoPage(pageNumberS.value() + 1)
-  }
-  
-  func prevPage() throws {
-    try gotoPage(pageNumberS.value() - 1)
+  func prevPage() {
+    guard pageNumberS.value > 1 else { return }
+    pageNumberS.value = pageNumberS.value - 1
   }
 }

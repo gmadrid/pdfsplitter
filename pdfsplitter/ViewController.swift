@@ -143,7 +143,7 @@ class ViewController: NSViewController {
     // At least disable the button.
     do {
       let s = try requireSplitter()
-      try s.nextPage()
+      s.nextPage()
     } catch {
       // XXX ERR
     }
@@ -152,7 +152,7 @@ class ViewController: NSViewController {
   @IBAction func prevPagePushed(sender: NSButton) {
     do {
       let s = try requireSplitter()
-      try s.prevPage()
+      s.prevPage()
     } catch {
       // XXX ERR
     }
