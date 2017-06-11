@@ -9,6 +9,7 @@
 import Cocoa
 import CoreGraphics
 import CoreImage
+import RxCocoa
 import RxSwift
 
 enum VCError : Error {
@@ -19,6 +20,13 @@ enum VCError : Error {
   case FailedToRenderImage
   case NoCurrentDocument
   case PageOutOfRange(pageNum: Int)
+}
+
+extension NSImage {
+  convenience init?(cgimage: CGImage?) {
+    guard let cgimage = cgimage else { return nil }
+    self.init(cgImage: cgimage, size: CGSize.zero)
+  }
 }
 
 class ViewController: NSViewController {
@@ -36,43 +44,35 @@ class ViewController: NSViewController {
     didSet {
       guard let s = splitter else { return }
       
-      s.pageDetailsS.subscribe(onNext: { [weak self] (image, pageNumber) in
-        guard let _self = self, let image = image, let pageNumber = pageNumber else {
-          self?.originalImageView.image = nil
-          self?.leftImageView.image = nil
-          self?.rightImageView.image = nil
-          return
+      s.pageImage_
+        .map { return NSImage(cgimage: $0) }
+        .bind(to: originalImageView.rx.image)
+        .disposed(by: disposeBag)
+      
+      s.leftPageImage_
+        .map { return NSImage(cgimage: $0) }
+        .bind(to: leftImageView.rx.image)
+        .disposed(by: disposeBag)
+      
+      s.rightPageImage_
+        .map { return NSImage(cgimage: $0) }
+        .bind(to: rightImageView.rx.image)
+        .disposed(by: disposeBag)
+      
+      Observable.combineLatest(s.pageNumber_.asObservable(), s.numberOfPages_) {
+        return String(format: "Page %d of %d", $0, $1)
         }
-
-        _self.originalImageView.image =
-          NSImage(cgImage: image, size: CGSize(width: image.width, height: image.height))
-        
-        // XXX !!! TODO get the number of pages here.
-        let pageDisplay = String(format: "Page %d of %d", pageNumber, 100)
-        self?.pageNumberField.stringValue = pageDisplay
-
-        do {
-          let leftImage = try ViewController.leftImageForImage(image)
-          let nsi = NSImage(cgImage: leftImage, size: CGSize(width: leftImage.width, height: leftImage.height))
-          _self.leftImageView.image = nsi
-        } catch {
-          _self.leftImageView.image = nil
-        }
-        
-        do {
-          let rightImage = try ViewController.rightImageForImage(image)
-          let nsi = NSImage(cgImage: rightImage, size: CGSize(width: rightImage.width, height: rightImage.height))
-          _self.rightImageView.image = nsi
-        } catch {
-          _self.rightImageView = nil
-        }
-        
-      })
-      .disposed(by: disposeBag)
+        .bind(to:pageNumberField.rx.text)
+        .disposed(by: disposeBag)
     }
   }
   
   var pdfUrl: URL?
+    
+  static func NSImageFromCGImage(_ cgimage: CGImage?) -> NSImage? {
+    guard let cgimage = cgimage else { return nil }
+    return NSImage(cgImage: cgimage, size: CGSize.zero)
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -83,25 +83,6 @@ class ViewController: NSViewController {
       try! openFile(url!)
     }
   }
-  
-  
-  
-  //  func updatePage() throws {
-  //    let doc = try requireSplitter()
-  //
-  //    let pageDisplay = String(format: "Page %d of %d", doc.pageNumber, doc.numberOfPages)
-  //    pageNumberField.stringValue = pageDisplay
-  //
-  //    let page = doc.page
-  //    let cgimage = try imageForPage(page)
-  //    let leftImage = try leftImageForImage(cgimage)
-  //    let rightImage = try rightImageForImage(cgimage)
-  //
-  //    // XXX TODO !!! error handling
-  //    originalImageView.image = imageForCGImage(cgimage: cgimage)
-  //    leftImageView.image = imageForCGImage(cgimage: leftImage)
-  //    rightImageView.image = imageForCGImage(cgimage: rightImage)
-  //  }
   
   override var representedObject: Any? {
     didSet {
@@ -143,7 +124,7 @@ class ViewController: NSViewController {
     // At least disable the button.
     do {
       let s = try requireSplitter()
-      s.nextPage()
+//      s.nextPage()
     } catch {
       // XXX ERR
     }
@@ -152,7 +133,7 @@ class ViewController: NSViewController {
   @IBAction func prevPagePushed(sender: NSButton) {
     do {
       let s = try requireSplitter()
-      s.prevPage()
+//      s.prevPage()
     } catch {
       // XXX ERR
     }
@@ -249,42 +230,6 @@ class ViewController: NSViewController {
       throw VCError.FailedToOpenPage(pageNum: pageNum)
     }
     return page
-  }
-  
-  func imageForCGImage(cgimage: CGImage) -> NSImage? {
-    return NSImage(cgImage: cgimage, size: CGSize(width: cgimage.width, height: cgimage.height))
-  }
-  
-  //  func imageForPage(_ page: CGPDFPage) throws -> CGImage {
-  //    let mediaBox = page.getBoxRect(.mediaBox)
-  //    let destBox = CGRect(origin: CGPoint.zero, size: CGSize(width: mediaBox.size.width * 1, height: mediaBox.size.height * 1))
-  //
-  //    guard let context = CGContext(data: nil, width: Int(destBox.size.width), height: Int(destBox.size.height), bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpace(name: CGColorSpace.genericRGBLinear)!, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue) else {
-  //      throw VCError.FailedToCreateGraphicsContext
-  //    }
-  //
-  //    context.drawPDFPage(page)
-  //
-  //    guard let cgimage = context.makeImage() else {
-  //      throw VCError.FailedToRenderImage
-  //    }
-  //    return cgimage
-  //  }
-  
-  static func leftImageForImage(_ image: CGImage) throws -> CGImage {
-    let rect = CGRect(x: 0, y: 0, width: image.width / 2, height: image.height)
-    guard let result = image.cropping(to: rect) else {
-      throw VCError.FailedToCropImage
-    }
-    return result
-  }
-  
-  static func rightImageForImage(_ image: CGImage) throws -> CGImage {
-    let rect = CGRect(x: image.width / 2, y: 0, width: image.width / 2, height: image.height)
-    guard let result = image.cropping(to: rect) else {
-      throw VCError.FailedToCropImage
-    }
-    return result
   }
 }
 

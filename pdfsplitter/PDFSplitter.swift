@@ -12,17 +12,14 @@ import RxSwift
 import RxCocoa
 
 class PDFSplitter {
-  /** Sequence of images and page numbers for the current page. */
-  var pageDetailsS: Observable<(CGImage?, Int?)>
-  
-  /** Sequence of total number of pages. */
-  private var _numberOfPagesS = Variable<Int>(0)
-  
+  let pageImage_: Observable<CGImage?>
+  let numberOfPages_: Observable<Int>
+  let pageNumber_: Variable<Int>
+  let leftPageImage_: Observable<CGImage?>
+  let rightPageImage_: Observable<CGImage?>
+
   private let disposeBag = DisposeBag()
-  private let pdfS: Observable<CGPDFDocument>
-  private var pageS: Observable<CGPDFPage>
-  // TODO: As a pedagogical exercise, see if you can get rid of this variable.
-  private let pageNumberS: Variable<Int>
+  private let pdf_: Observable<CGPDFDocument> 
   
   convenience init(url: URL) throws {
     guard let document = CGPDFDocument(url as CFURL) else {
@@ -31,28 +28,37 @@ class PDFSplitter {
     try self.init(pdf: document)
   }
   
-  init(pdf document: CGPDFDocument) throws {
-    self.pdfS = Observable.just(document)
-    pdfS.map { $0.numberOfPages }.bind(to: self._numberOfPagesS).disposed(by: disposeBag)
-
-    self.pageNumberS = Variable(1)
-
-    self.pageS = Observable.combineLatest(pdfS, _numberOfPagesS.asObservable(), pageNumberS.asObservable()) {
+  init(pdf: CGPDFDocument) throws {
+    pdf_ = Observable.just(pdf)
+    numberOfPages_ = pdf_.map { return $0.numberOfPages }
+    
+    pageNumber_ = Variable(1) // pdf pages start numbering at 1
+    
+    pageImage_ = Observable.combineLatest(pdf_, numberOfPages_, pageNumber_.asObservable()) {
       return ($0, $1, $2)
       }
-      .filter() { (pdf, numberOfPages, pageNumber) in
+      .filter { (pdf, numberOfPages, pageNumber) in
         return 1...numberOfPages ~= pageNumber
       }
-      .map() { (page, numberOfPages, pageNumber) in
-        return try PDFSplitter.readPage(at: pageNumber, from: page)
+      .map { (pdf, numberOfPages, pageNumber) -> CGPDFPage? in
+        return pdf.page(at: pageNumber)
+      }
+      .map { page in
+        guard let page = page else { return nil }
+        return PDFSplitter.makeImageForPage(page)
     }
     
-    self.pageDetailsS = pageS.map { page in
-      return (PDFSplitter.makeImageForPage(page), page.pageNumber)
-      }
-      .catchErrorJustReturn((nil, nil))
+    leftPageImage_ = pageImage_.map { image in
+      guard let image = image else { return nil }
+      return PDFSplitter.makeLeftImageFromImage(image)
+    }
+    
+    rightPageImage_ = pageImage_.map { image in
+      guard let image = image else { return nil }
+      return PDFSplitter.makeRightImageFromImage(image)
+    }
   }
-  
+
   private static func makeImageForPage(_ page: CGPDFPage) -> CGImage? {
     let mediaBox = page.getBoxRect(.mediaBox)
     let destBox = CGRect(origin: CGPoint.zero, size: mediaBox.size)
@@ -74,20 +80,23 @@ class PDFSplitter {
     }
   }
   
-  private static func readPage(at pageNum: Int, from pdf: CGPDFDocument) throws -> CGPDFPage {
-    guard let result = pdf.page(at: pageNum) else {
-      throw VCError.FailedToOpenPage(pageNum: pageNum)
-    }
-    return result
+  static func makeLeftImageFromImage(_ image: CGImage) -> CGImage? {
+    let rect = CGRect(x: 0, y: 0, width: image.width / 2, height: image.height)
+    return image.cropping(to: rect)
   }
   
-  func nextPage() {
-    guard pageNumberS.value < _numberOfPagesS.value else { return }
-    pageNumberS.value = pageNumberS.value + 1
+  static func makeRightImageFromImage(_ image: CGImage) -> CGImage? {
+    let rect = CGRect(x: image.width / 2, y: 0, width: image.width / 2, height: image.height)
+    return image.cropping(to: rect)
   }
   
-  func prevPage() {
-    guard pageNumberS.value > 1 else { return }
-    pageNumberS.value = pageNumberS.value - 1
-  }
+//  func nextPage() {
+//    guard pageNumberS.value < _numberOfPagesS.value else { return }
+//    pageNumberS.value = pageNumberS.value + 1
+//  }
+//  
+//  func prevPage() {
+//    guard pageNumberS.value > 1 else { return }
+//    pageNumberS.value = pageNumberS.value - 1
+//  }
 }
