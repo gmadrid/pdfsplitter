@@ -12,15 +12,14 @@ import RxSwift
 import RxCocoa
 
 class PDFSplitter {
-  // Sequence of images and page numbers for the current page.
-  var pageDetailsS: BehaviorSubject<(CGImage?, Int?)>
+  /** Sequence of images and page numbers for the current page. */
+  var pageDetailsS: Observable<(CGImage?, Int?)>
   /** Sequence of total number of pages. */
-  var numberOfPagesS: BehaviorSubject<Int>
+  var numberOfPagesS: Observable<Int>
   
-  private let disposeBag = DisposeBag();
   private let pdfS: Observable<CGPDFDocument>
   private let pageNumberS: BehaviorSubject<Int>
-  private var pageS: BehaviorSubject<CGPDFPage>
+  private var pageS: Observable<CGPDFPage>
   
   convenience init(url: URL) throws {
     guard let document = CGPDFDocument(url as CFURL) else {
@@ -30,28 +29,18 @@ class PDFSplitter {
   }
   
   init(pdf document: CGPDFDocument) throws {
-//    self.pdfS = BehaviorSubject(value: document)
     self.pdfS = Observable.just(document).shareReplay(1)
+    self.numberOfPagesS = pdfS.map { $0.numberOfPages }
+
     self.pageNumberS = BehaviorSubject(value: 1)
 
-    self.numberOfPagesS = BehaviorSubject(value: document.numberOfPages)
-    
-    let initialPage = try PDFSplitter.readPage(at: pageNumberS.value(), from: document)
-    let pageS = BehaviorSubject(value: initialPage)
-    Observable.combineLatest(pdfS, pageNumberS) { p, pn in
+    self.pageS = Observable.combineLatest(pdfS, pageNumberS) { p, pn in
       return try! PDFSplitter.readPage(at: pn, from: p)
       }
-      .bind(to: pageS)
-      .disposed(by: disposeBag)
-    self.pageS = pageS
-      
-    let pageDetailsS: BehaviorSubject<(CGImage?, Int?)> = BehaviorSubject(value: (nil, nil))
-    pageS.map { page in
+    
+    self.pageDetailsS = pageS.map { page in
       return (PDFSplitter.makeImageForPage(page), page.pageNumber)
       }
-      .bind(to: pageDetailsS)
-      .disposed(by: disposeBag)
-    self.pageDetailsS = pageDetailsS
   }
   
   private static func makeImageForPage(_ page: CGPDFPage) -> CGImage? {
