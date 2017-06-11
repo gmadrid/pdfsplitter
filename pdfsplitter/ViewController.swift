@@ -34,11 +34,9 @@ class ViewController: NSViewController {
   
   var splitter: PDFSplitter? {
     didSet {
-      print("DID SET SPLITTER")
       guard let s = splitter else { return }
       
-      s.pageImage.subscribe(onNext: { [weak self] (image, pageNumber) in
-        print("PAGEIMAGE ONNEXT")
+      s.pageDetailsS.subscribe(onNext: { [weak self] (image, pageNumber) in
         guard let _self = self, let image = image, let pageNumber = pageNumber else {
           self?.originalImageView.image = nil
           self?.leftImageView.image = nil
@@ -80,7 +78,10 @@ class ViewController: NSViewController {
     super.viewDidLoad()
     
     // Do any additional setup after loading the view.
-    
+    let url = URL(string: "file:///Users/gmadrid/Dropbox/Sonata%20-%20Juan%20Tamariz.pdf")
+    if url != nil {
+      try! openFile(url!)
+    }
   }
   
   
@@ -126,6 +127,7 @@ class ViewController: NSViewController {
         return
       }
       do {
+        print(url)
         try openFile(url)
       } catch {
         // DO SOMETHING HERE TODO !!! XXX

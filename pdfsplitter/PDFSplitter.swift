@@ -9,16 +9,18 @@
 import CoreGraphics
 import Foundation
 import RxSwift
+import RxCocoa
 
 class PDFSplitter {
   // Sequence of images and page numbers for the current page.
-  var pageImage: Observable<(CGImage?, Int?)>
-  var numberOfPages: Observable<Int>
+  var pageDetailsS: BehaviorSubject<(CGImage?, Int?)>
+  /** Sequence of total number of pages. */
+  var numberOfPagesS: BehaviorSubject<Int>
   
   private let disposeBag = DisposeBag();
-  private let pdf: Observable<CGPDFDocument>
-  private let pageNumber: BehaviorSubject<Int>
-  private let page: Observable<CGPDFPage>
+  private let pdfS: Observable<CGPDFDocument>
+  private let pageNumberS: BehaviorSubject<Int>
+  private var pageS: BehaviorSubject<CGPDFPage>
   
   convenience init(url: URL) throws {
     guard let document = CGPDFDocument(url as CFURL) else {
@@ -28,20 +30,28 @@ class PDFSplitter {
   }
   
   init(pdf document: CGPDFDocument) throws {
-    self.pdf = Observable.just(document).replay(1)
-    self.pageNumber = BehaviorSubject(value: 1)
-    self.numberOfPages = pdf.map({ return $0.numberOfPages })
+//    self.pdfS = BehaviorSubject(value: document)
+    self.pdfS = Observable.just(document).shareReplay(1)
+    self.pageNumberS = BehaviorSubject(value: 1)
+
+    self.numberOfPagesS = BehaviorSubject(value: document.numberOfPages)
     
-    self.page = Observable.combineLatest(pdf, pageNumber)
-      .map { (pdf, pageNumber) in
-        print("MAPPING PAGE")
-        return try! PDFSplitter.readPage(at: pageNumber, from: pdf)
-    }
-    
-    self.pageImage = page.map({ page in
-      print("MAPPING PAGEIMAGE")
-        return (PDFSplitter.makeImageForPage(page), page.pageNumber)
-    }).startWith((nil, nil)).replay(1)
+    let initialPage = try PDFSplitter.readPage(at: pageNumberS.value(), from: document)
+    let pageS = BehaviorSubject(value: initialPage)
+    Observable.combineLatest(pdfS, pageNumberS) { p, pn in
+      return try! PDFSplitter.readPage(at: pn, from: p)
+      }
+      .bind(to: pageS)
+      .disposed(by: disposeBag)
+    self.pageS = pageS
+      
+    let pageDetailsS: BehaviorSubject<(CGImage?, Int?)> = BehaviorSubject(value: (nil, nil))
+    pageS.map { page in
+      return (PDFSplitter.makeImageForPage(page), page.pageNumber)
+      }
+      .bind(to: pageDetailsS)
+      .disposed(by: disposeBag)
+    self.pageDetailsS = pageDetailsS
   }
   
   private static func makeImageForPage(_ page: CGPDFPage) -> CGImage? {
@@ -73,15 +83,14 @@ class PDFSplitter {
   }
   
   func gotoPage(_ pageNum: Int) throws {
-    pageNumber.onNext(pageNum)
+    pageNumberS.onNext(pageNum)
   }
   
   func nextPage() throws {
-    print("NEXT PAGE")
-    try gotoPage(pageNumber.value() + 1)
+    try gotoPage(pageNumberS.value() + 1)
   }
   
   func prevPage() throws {
-    try gotoPage(pageNumber.value() - 1)
+    try gotoPage(pageNumberS.value() - 1)
   }
 }
