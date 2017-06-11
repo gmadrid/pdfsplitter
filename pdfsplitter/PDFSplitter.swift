@@ -29,7 +29,7 @@ class PDFSplitter {
   }
   
   init(pdf document: CGPDFDocument) throws {
-    self.pdfS = Observable.just(document).shareReplay(1)
+    self.pdfS = Observable.just(document)
     self.numberOfPagesS = pdfS.map { $0.numberOfPages }
 
     self.pageNumberS = BehaviorSubject(value: 1)
