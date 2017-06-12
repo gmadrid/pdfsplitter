@@ -38,11 +38,14 @@ class ViewController: NSViewController {
   
   @IBOutlet var nextPageButton: NSButton!
   @IBOutlet var prevPageButton: NSButton!
+  @IBOutlet var splitButton: NSButton!
   
   private let disposeBag = DisposeBag()
   
   var splitter: PDFSplitter? {
     didSet {
+      splitButton.isEnabled = splitter != nil
+      
       guard let s = splitter else { return }
       
       s.pageImage_
@@ -66,10 +69,13 @@ class ViewController: NSViewController {
         .bind(to:pageNumberField.rx.text)
         .disposed(by: disposeBag)
       
-      s.pageNumber_.map { $0 > 1 } .bind(to:prevPageButton.rx.isEnabled).disposed(by: disposeBag)
+      s.pageNumber_.map { $0 > 1 }
+        .bind(to:prevPageButton.rx.isEnabled).disposed(by: disposeBag)
+      
       Observable.combineLatest(s.pageNumber_, s.numberOfPages_) { pageNumber, numberOfPages in
         return pageNumber < numberOfPages
-      }.bind(to: nextPageButton.rx.isEnabled).disposed(by: disposeBag)
+        }
+        .bind(to: nextPageButton.rx.isEnabled).disposed(by: disposeBag)
     }
   }
   
@@ -86,7 +92,7 @@ class ViewController: NSViewController {
     // Do any additional setup after loading the view.
     let url = URL(string: "file:///Users/gmadrid/Dropbox/Sonata%20-%20Juan%20Tamariz.pdf")
     if url != nil {
-      try! openFile(url!)
+//      try! openFile(url!)
     }
   }
   

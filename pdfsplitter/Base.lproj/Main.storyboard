@@ -757,7 +757,7 @@
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EBf-hp-1TC">
                                 <rect key="frame" x="743" y="13" width="68" height="32"/>
-                                <buttonCell key="cell" type="push" title="Split" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MHk-2S-2xe">
+                                <buttonCell key="cell" type="push" title="Split" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MHk-2S-2xe">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -807,6 +807,7 @@
                         <outlet property="pageNumberField" destination="5vn-WL-7fj" id="EfC-85-XjL"/>
                         <outlet property="prevPageButton" destination="fqR-Zb-R8D" id="BOF-It-NCx"/>
                         <outlet property="rightImageView" destination="d9e-b8-CUA" id="MVg-Fd-cMp"/>
+                        <outlet property="splitButton" destination="EBf-hp-1TC" id="sl4-W9-0aK"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
