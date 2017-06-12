@@ -105,13 +105,6 @@ class ViewController: NSViewController {
     }
   }
   
-  var pdfUrl: URL?
-    
-  static func NSImageFromCGImage(_ cgimage: CGImage?) -> NSImage? {
-    guard let cgimage = cgimage else { return nil }
-    return NSImage(cgImage: cgimage, size: CGSize.zero)
-  }
-  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -119,12 +112,6 @@ class ViewController: NSViewController {
     let url = URL(string: "file:///Users/gmadrid/Dropbox/Sonata%20-%20Juan%20Tamariz.pdf")
     if url != nil {
       try! openFile(url!)
-    }
-  }
-  
-  override var representedObject: Any? {
-    didSet {
-      // Update the view, if already loaded.
     }
   }
   
@@ -241,14 +228,12 @@ class ViewController: NSViewController {
   func openFile(_ fileURL: URL) throws {
     closeFile();
     
-    pdfUrl = fileURL
     filenameField.stringValue = fileURL.path
     
     splitter = try PDFSplitter(url: fileURL)
   }
   
   func closeFile() {
-    pdfUrl = nil
     filenameField.stringValue = ""
     originalImageView.image = nil
     leftImageView.image = nil

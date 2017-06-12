@@ -1,7 +1,7 @@
 #### TODO
 * Move processing to other threads
-* Create slider to change pages
 * Have progress bar for processing
+* Put stuff in Stack views where useful.
 
 * Move all of the pdf handling out of the VC
 
