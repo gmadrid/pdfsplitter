@@ -41,6 +41,7 @@ class ViewController: NSViewController {
   @IBOutlet var prevPageButton: NSButton!
   @IBOutlet var splitButton: NSButton!
   
+  // TODO: make this a sequence, OR make this document-based.
   var splitter: PDFSplitter? {
     didSet {
       splitButton.isEnabled = splitter != nil
@@ -48,34 +49,40 @@ class ViewController: NSViewController {
       
       guard let s = splitter else { return }
       
-      // Dispose immediately. We're just unwrapping this to set these initial values.
+      // Set the max/min values for the slider.
+      // (Dispose immediately. We're just unwrapping this to set these initial values.)
       s.numberOfPages_.subscribe(onNext: { [weak self] numberOfPages in
         self?.pageNumberSlider.minValue = 1.0
         self?.pageNumberSlider.maxValue = Double(numberOfPages)
       })
         .dispose()
       
+      // Set the original image view from the splitter.
       s.pageImage_
         .map { return NSImage(cgimage: $0) }
         .bind(to: originalImageView.rx.image)
         .disposed(by: s.disposeBag)
       
+      // Set the left page image from the splitter.
       s.leftPageImage_
         .map { return NSImage(cgimage: $0) }
         .bind(to: leftImageView.rx.image)
         .disposed(by: s.disposeBag)
       
+      // Set the right page view from the splitter.
       s.rightPageImage_
         .map { return NSImage(cgimage: $0) }
         .bind(to: rightImageView.rx.image)
         .disposed(by: s.disposeBag)
       
+      // Display the page number.
       Observable.combineLatest(s.pageNumber_, s.numberOfPages_) {
         return String(format: "Page %d of %d", $0, $1)
         }
         .bind(to:pageNumberField.rx.text)
         .disposed(by: s.disposeBag)
       
+      // Enable/disable the next/prev buttons based on the page number.
       s.pageNumber_.map { $0 > 1 }
         .bind(to:prevPageButton.rx.isEnabled).disposed(by: s.disposeBag)
       Observable.combineLatest(s.pageNumber_, s.numberOfPages_) { pageNumber, numberOfPages in
@@ -83,6 +90,7 @@ class ViewController: NSViewController {
         }
         .bind(to: nextPageButton.rx.isEnabled).disposed(by: s.disposeBag)
       
+      // Two-way update of the page number slider.
       s.pageNumber_.distinctUntilChanged()
         .map { Double($0) }
         .bind(to: pageNumberSlider.rx.value)
