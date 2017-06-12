@@ -19,8 +19,8 @@ class PDFSplitter {
 
   private let disposeBag = DisposeBag()
   private let pdf_: Observable<CGPDFDocument> 
-  let pageNumber__: Variable<Int>
-  let numberOfPages__: Variable<Int>
+  private let pageNumber__: Variable<Int>
+  private let numberOfPages__: Variable<Int>
   
   convenience init(url: URL) throws {
     guard let document = CGPDFDocument(url as CFURL) else {

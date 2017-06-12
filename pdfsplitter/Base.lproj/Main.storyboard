@@ -805,6 +805,7 @@
                         <outlet property="nextPageButton" destination="7HR-CJ-5v5" id="9id-Ab-xBB"/>
                         <outlet property="originalImageView" destination="bHO-Kk-v3i" id="YzS-ET-oE6"/>
                         <outlet property="pageNumberField" destination="5vn-WL-7fj" id="EfC-85-XjL"/>
+                        <outlet property="prevPageButton" destination="fqR-Zb-R8D" id="BOF-It-NCx"/>
                         <outlet property="rightImageView" destination="d9e-b8-CUA" id="MVg-Fd-cMp"/>
                     </connections>
                 </viewController>

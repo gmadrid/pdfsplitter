@@ -37,6 +37,7 @@ class ViewController: NSViewController {
   @IBOutlet var rightImageView: NSImageView!
   
   @IBOutlet var nextPageButton: NSButton!
+  @IBOutlet var prevPageButton: NSButton!
   
   private let disposeBag = DisposeBag()
   
@@ -59,11 +60,16 @@ class ViewController: NSViewController {
         .bind(to: rightImageView.rx.image)
         .disposed(by: disposeBag)
       
-      Observable.combineLatest(s.pageNumber_.asObservable(), s.numberOfPages_) {
+      Observable.combineLatest(s.pageNumber_, s.numberOfPages_) {
         return String(format: "Page %d of %d", $0, $1)
         }
         .bind(to:pageNumberField.rx.text)
         .disposed(by: disposeBag)
+      
+      s.pageNumber_.map { $0 > 1 } .bind(to:prevPageButton.rx.isEnabled).disposed(by: disposeBag)
+      Observable.combineLatest(s.pageNumber_, s.numberOfPages_) { pageNumber, numberOfPages in
+        return pageNumber < numberOfPages
+      }.bind(to: nextPageButton.rx.isEnabled).disposed(by: disposeBag)
     }
   }
   
