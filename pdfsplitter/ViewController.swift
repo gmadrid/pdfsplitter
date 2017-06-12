@@ -40,7 +40,7 @@ class ViewController: NSViewController {
   @IBOutlet var prevPageButton: NSButton!
   @IBOutlet var splitButton: NSButton!
   
-  private let disposeBag = DisposeBag()
+//  private let disposeBag = DisposeBag()
   
   var splitter: PDFSplitter? {
     didSet {
@@ -51,31 +51,31 @@ class ViewController: NSViewController {
       s.pageImage_
         .map { return NSImage(cgimage: $0) }
         .bind(to: originalImageView.rx.image)
-        .disposed(by: disposeBag)
+        .disposed(by: s.disposeBag)
       
       s.leftPageImage_
         .map { return NSImage(cgimage: $0) }
         .bind(to: leftImageView.rx.image)
-        .disposed(by: disposeBag)
+        .disposed(by: s.disposeBag)
       
       s.rightPageImage_
         .map { return NSImage(cgimage: $0) }
         .bind(to: rightImageView.rx.image)
-        .disposed(by: disposeBag)
+        .disposed(by: s.disposeBag)
       
       Observable.combineLatest(s.pageNumber_, s.numberOfPages_) {
         return String(format: "Page %d of %d", $0, $1)
         }
         .bind(to:pageNumberField.rx.text)
-        .disposed(by: disposeBag)
+        .disposed(by: s.disposeBag)
       
       s.pageNumber_.map { $0 > 1 }
-        .bind(to:prevPageButton.rx.isEnabled).disposed(by: disposeBag)
+        .bind(to:prevPageButton.rx.isEnabled).disposed(by: s.disposeBag)
       
       Observable.combineLatest(s.pageNumber_, s.numberOfPages_) { pageNumber, numberOfPages in
         return pageNumber < numberOfPages
         }
-        .bind(to: nextPageButton.rx.isEnabled).disposed(by: disposeBag)
+        .bind(to: nextPageButton.rx.isEnabled).disposed(by: s.disposeBag)
     }
   }
   

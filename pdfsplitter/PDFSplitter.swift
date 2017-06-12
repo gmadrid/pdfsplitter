@@ -11,14 +11,14 @@ import Foundation
 import RxSwift
 
 class PDFSplitter {
+  let disposeBag = DisposeBag()
   let pageImage_: Observable<CGImage?>
   var numberOfPages_: Observable<Int> { return numberOfPages__.asObservable() }
   var pageNumber_: Observable<Int> { return pageNumber__.asObservable() }
   let leftPageImage_: Observable<CGImage?>
   let rightPageImage_: Observable<CGImage?>
 
-  private let disposeBag = DisposeBag()
-  private let pdf_: Observable<CGPDFDocument> 
+  private let pdf_: Observable<CGPDFDocument>
   private let pageNumber__: Variable<Int>
   private let numberOfPages__: Variable<Int>
   
