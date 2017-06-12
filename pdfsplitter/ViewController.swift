@@ -14,12 +14,12 @@ import RxSwift
 
 enum VCError : Error {
   case CouldntOpenPdfToRead(url: URL)
-  case FailedToCreateGraphicsContext
-  case FailedToCropImage
-  case FailedToOpenPage(pageNum: Int)
-  case FailedToRenderImage
+//  case FailedToCreateGraphicsContext
+//  case FailedToCropImage
+//  case FailedToOpenPage(pageNum: Int)
+//  case FailedToRenderImage
   case NoCurrentDocument
-  case PageOutOfRange(pageNum: Int)
+//  case PageOutOfRange(pageNum: Int)
 }
 
 extension NSImage {
@@ -124,7 +124,7 @@ class ViewController: NSViewController {
     // At least disable the button.
     do {
       let s = try requireSplitter()
-//      s.nextPage()
+      s.nextPage()
     } catch {
       // XXX ERR
     }
@@ -133,7 +133,7 @@ class ViewController: NSViewController {
   @IBAction func prevPagePushed(sender: NSButton) {
     do {
       let s = try requireSplitter()
-//      s.prevPage()
+      s.prevPage()
     } catch {
       // XXX ERR
     }
@@ -223,13 +223,6 @@ class ViewController: NSViewController {
       throw VCError.NoCurrentDocument
     }
     return s
-  }
-  
-  func getPageFromDocument(_ pageNum: Int, fromDoc doc: CGPDFDocument) throws -> CGPDFPage {
-    guard let page = doc.page(at: pageNum) else {
-      throw VCError.FailedToOpenPage(pageNum: pageNum)
-    }
-    return page
-  }
+  }  
 }
 

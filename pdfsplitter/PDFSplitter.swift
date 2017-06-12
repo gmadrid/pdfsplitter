@@ -9,17 +9,18 @@
 import CoreGraphics
 import Foundation
 import RxSwift
-import RxCocoa
 
 class PDFSplitter {
   let pageImage_: Observable<CGImage?>
-  let numberOfPages_: Observable<Int>
-  let pageNumber_: Variable<Int>
+  var numberOfPages_: Observable<Int> { return numberOfPages__.asObservable() }
+  var pageNumber_: Observable<Int> { return pageNumber__.asObservable() }
   let leftPageImage_: Observable<CGImage?>
   let rightPageImage_: Observable<CGImage?>
 
   private let disposeBag = DisposeBag()
   private let pdf_: Observable<CGPDFDocument> 
+  let pageNumber__: Variable<Int>
+  let numberOfPages__: Variable<Int>
   
   convenience init(url: URL) throws {
     guard let document = CGPDFDocument(url as CFURL) else {
@@ -30,11 +31,11 @@ class PDFSplitter {
   
   init(pdf: CGPDFDocument) throws {
     pdf_ = Observable.just(pdf)
-    numberOfPages_ = pdf_.map { return $0.numberOfPages }
+    numberOfPages__ = Variable(pdf.numberOfPages)
     
-    pageNumber_ = Variable(1) // pdf pages start numbering at 1
+    pageNumber__ = Variable(1) // pdf pages start numbering at 1
     
-    pageImage_ = Observable.combineLatest(pdf_, numberOfPages_, pageNumber_.asObservable()) {
+    pageImage_ = Observable.combineLatest(pdf_, numberOfPages__.asObservable(), pageNumber__.asObservable()) {
       return ($0, $1, $2)
       }
       .filter { (pdf, numberOfPages, pageNumber) in
@@ -63,21 +64,17 @@ class PDFSplitter {
     let mediaBox = page.getBoxRect(.mediaBox)
     let destBox = CGRect(origin: CGPoint.zero, size: mediaBox.size)
     
-    do {
       guard let context = CGContext(data: nil, width: Int(destBox.size.width), height: Int(destBox.size.height), bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpace(name: CGColorSpace.genericRGBLinear)!, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue) else {
-        throw VCError.FailedToCreateGraphicsContext
+        return nil
       }
       
       context.drawPDFPage(page)
       
       guard let cgimage = context.makeImage() else {
-        throw VCError.FailedToRenderImage
+        return nil
       }
       
       return cgimage
-    } catch {
-      return nil
-    }
   }
   
   static func makeLeftImageFromImage(_ image: CGImage) -> CGImage? {
@@ -90,13 +87,15 @@ class PDFSplitter {
     return image.cropping(to: rect)
   }
   
-//  func nextPage() {
-//    guard pageNumberS.value < _numberOfPagesS.value else { return }
-//    pageNumberS.value = pageNumberS.value + 1
-//  }
-//  
-//  func prevPage() {
-//    guard pageNumberS.value > 1 else { return }
-//    pageNumberS.value = pageNumberS.value - 1
-//  }
+  func nextPage() {
+    if pageNumber__.value < numberOfPages__.value {
+      pageNumber__.value = pageNumber__.value + 1
+    }
+  }
+  
+  func prevPage() {
+    if pageNumber__.value > 1 {
+      pageNumber__.value = pageNumber__.value - 1
+    }
+  }
 }
