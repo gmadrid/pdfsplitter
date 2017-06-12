@@ -92,7 +92,7 @@ class ViewController: NSViewController {
     // Do any additional setup after loading the view.
     let url = URL(string: "file:///Users/gmadrid/Dropbox/Sonata%20-%20Juan%20Tamariz.pdf")
     if url != nil {
-//      try! openFile(url!)
+      try! openFile(url!)
     }
   }
   
@@ -235,6 +235,12 @@ class ViewController: NSViewController {
       throw VCError.NoCurrentDocument
     }
     return s
-  }  
+  }
+  
+  override func viewDidDisappear() {
+    // When the user closes the window, close the app.
+    super.viewDidDisappear()
+    NSApplication.shared().terminate(nil)
+  }
 }
 
