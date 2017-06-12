@@ -87,6 +87,12 @@ class PDFSplitter {
     return image.cropping(to: rect)
   }
   
+  func gotoPage(_ pageNumber: Int) {
+    guard 1...numberOfPages__.value ~= pageNumber else { return }
+    guard pageNumber__.value != pageNumber else { return }
+    pageNumber__.value = pageNumber
+  }
+  
   func nextPage() {
     if pageNumber__.value < numberOfPages__.value {
       pageNumber__.value = pageNumber__.value + 1

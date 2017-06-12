@@ -715,27 +715,27 @@
                                     <action selector="openFilePushedWithSender:" target="XfG-lQ-9wD" id="Lpk-dc-iaJ"/>
                                 </connections>
                             </button>
-                            <textField identifier="pageNumberField" horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5vn-WL-7fj">
-                                <rect key="frame" x="38" y="672" width="769" height="17"/>
+                            <textField identifier="pageNumberField" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5vn-WL-7fj">
+                                <rect key="frame" x="38" y="672" width="4" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="G7D-Zo-xAa">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bHO-Kk-v3i" userLabel="originalView">
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bHO-Kk-v3i" userLabel="originalView">
                                 <rect key="frame" x="37" y="378" width="771" height="289"/>
                                 <imageCell key="cell" selectable="YES" editable="YES" enabled="NO" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" id="ShW-d9-MMY"/>
                             </imageView>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="d9e-b8-CUA" userLabel="splitView2">
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d9e-b8-CUA" userLabel="splitView2">
                                 <rect key="frame" x="424" y="58" width="384" height="289"/>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" id="MPY-ia-FDR"/>
                             </imageView>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="o3u-0x-f8w" userLabel="splitView1">
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o3u-0x-f8w" userLabel="splitView1">
                                 <rect key="frame" x="37" y="58" width="385" height="289"/>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" id="CQZ-hd-CYh"/>
                             </imageView>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fqR-Zb-R8D" userLabel="prevPage">
+                            <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fqR-Zb-R8D" userLabel="prevPage">
                                 <rect key="frame" x="380" y="345" width="45" height="32"/>
                                 <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSLeftFacingTriangleTemplate" imagePosition="overlaps" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vKG-M4-08H">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -745,7 +745,7 @@
                                     <action selector="prevPagePushedWithSender:" target="XfG-lQ-9wD" id="696-vp-fQs"/>
                                 </connections>
                             </button>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7HR-CJ-5v5" userLabel="nextPage">
+                            <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7HR-CJ-5v5" userLabel="nextPage">
                                 <rect key="frame" x="421" y="345" width="45" height="32"/>
                                 <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSRightFacingTriangleTemplate" imagePosition="only" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="SfW-7R-ROG">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -765,12 +765,17 @@
                                     <action selector="splitPushedWithSender:" target="XfG-lQ-9wD" id="ub0-bf-bJA"/>
                                 </connections>
                             </button>
+                            <slider verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aeG-we-5bb" userLabel="pageNumberSlider">
+                                <rect key="frame" x="46" y="670" width="761" height="19"/>
+                                <sliderCell key="cell" enabled="NO" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="7SB-9q-rB2"/>
+                            </slider>
                         </subviews>
                         <constraints>
                             <constraint firstItem="7HR-CJ-5v5" firstAttribute="top" secondItem="fqR-Zb-R8D" secondAttribute="top" id="18o-y6-ODw"/>
                             <constraint firstItem="LdV-70-9z1" firstAttribute="baseline" secondItem="toG-RC-7JN" secondAttribute="baseline" id="4rK-kS-HeL"/>
                             <constraint firstItem="fqR-Zb-R8D" firstAttribute="top" secondItem="bHO-Kk-v3i" secondAttribute="bottom" constant="8" id="7k9-lD-OPD"/>
                             <constraint firstItem="o3u-0x-f8w" firstAttribute="top" secondItem="d9e-b8-CUA" secondAttribute="top" id="Co7-7m-fAm"/>
+                            <constraint firstItem="aeG-we-5bb" firstAttribute="height" secondItem="5vn-WL-7fj" secondAttribute="height" id="FiS-iF-dd7"/>
                             <constraint firstItem="7HR-CJ-5v5" firstAttribute="bottom" secondItem="fqR-Zb-R8D" secondAttribute="bottom" id="HYO-7Y-KdJ"/>
                             <constraint firstItem="o3u-0x-f8w" firstAttribute="top" secondItem="fqR-Zb-R8D" secondAttribute="bottom" constant="8" id="Icf-sy-u7c"/>
                             <constraint firstItem="LdV-70-9z1" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" id="K8b-h7-hz6"/>
@@ -788,13 +793,15 @@
                             <constraint firstItem="d9e-b8-CUA" firstAttribute="height" secondItem="o3u-0x-f8w" secondAttribute="height" id="jS8-sG-gGf"/>
                             <constraint firstItem="o3u-0x-f8w" firstAttribute="width" secondItem="d9e-b8-CUA" secondAttribute="width" id="jhx-aC-Tzu"/>
                             <constraint firstItem="7HR-CJ-5v5" firstAttribute="width" secondItem="fqR-Zb-R8D" secondAttribute="width" id="mZ3-Yo-SuD"/>
-                            <constraint firstItem="5vn-WL-7fj" firstAttribute="trailing" secondItem="1X1-Af-rPe" secondAttribute="trailing" id="muk-kV-3Xi"/>
                             <constraint firstAttribute="trailing" secondItem="1X1-Af-rPe" secondAttribute="trailing" constant="40" id="o34-BJ-Hvb"/>
+                            <constraint firstItem="1X1-Af-rPe" firstAttribute="trailing" secondItem="aeG-we-5bb" secondAttribute="trailing" id="oMS-OM-EIY"/>
                             <constraint firstItem="bHO-Kk-v3i" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="40" id="pmR-ma-mFF"/>
                             <constraint firstItem="1X1-Af-rPe" firstAttribute="baseline" secondItem="toG-RC-7JN" secondAttribute="baseline" id="pnP-tG-osl"/>
                             <constraint firstItem="d9e-b8-CUA" firstAttribute="leading" secondItem="o3u-0x-f8w" secondAttribute="trailing" constant="8" id="prO-K7-7Np"/>
                             <constraint firstItem="d9e-b8-CUA" firstAttribute="trailing" secondItem="bHO-Kk-v3i" secondAttribute="trailing" id="s5k-yt-teG"/>
                             <constraint firstItem="1X1-Af-rPe" firstAttribute="leading" secondItem="toG-RC-7JN" secondAttribute="trailing" constant="8" id="seB-OS-rIl"/>
+                            <constraint firstItem="aeG-we-5bb" firstAttribute="leading" secondItem="5vn-WL-7fj" secondAttribute="trailing" constant="8" id="uCT-sh-2v6"/>
+                            <constraint firstItem="5vn-WL-7fj" firstAttribute="baseline" secondItem="aeG-we-5bb" secondAttribute="baseline" id="uE4-VO-Er3"/>
                             <constraint firstItem="LdV-70-9z1" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="40" id="xUE-tr-EQs"/>
                             <constraint firstItem="5vn-WL-7fj" firstAttribute="top" secondItem="LdV-70-9z1" secondAttribute="bottom" constant="8" id="zLO-7m-kiR"/>
                         </constraints>
@@ -805,6 +812,7 @@
                         <outlet property="nextPageButton" destination="7HR-CJ-5v5" id="9id-Ab-xBB"/>
                         <outlet property="originalImageView" destination="bHO-Kk-v3i" id="YzS-ET-oE6"/>
                         <outlet property="pageNumberField" destination="5vn-WL-7fj" id="EfC-85-XjL"/>
+                        <outlet property="pageNumberSlider" destination="aeG-we-5bb" id="szR-hQ-Rfc"/>
                         <outlet property="prevPageButton" destination="fqR-Zb-R8D" id="BOF-It-NCx"/>
                         <outlet property="rightImageView" destination="d9e-b8-CUA" id="MVg-Fd-cMp"/>
                         <outlet property="splitButton" destination="EBf-hp-1TC" id="sl4-W9-0aK"/>

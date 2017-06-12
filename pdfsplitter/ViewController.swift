@@ -35,18 +35,25 @@ class ViewController: NSViewController {
   @IBOutlet var originalImageView: NSImageView!
   @IBOutlet var leftImageView: NSImageView!
   @IBOutlet var rightImageView: NSImageView!
+  @IBOutlet var pageNumberSlider: NSSlider!
   
   @IBOutlet var nextPageButton: NSButton!
   @IBOutlet var prevPageButton: NSButton!
   @IBOutlet var splitButton: NSButton!
   
-//  private let disposeBag = DisposeBag()
-  
   var splitter: PDFSplitter? {
     didSet {
       splitButton.isEnabled = splitter != nil
+      pageNumberSlider.isEnabled = splitter != nil
       
       guard let s = splitter else { return }
+      
+      // Dispose immediately. We're just unwrapping this to set these initial values.
+      s.numberOfPages_.subscribe(onNext: { [weak self] numberOfPages in
+        self?.pageNumberSlider.minValue = 1.0
+        self?.pageNumberSlider.maxValue = Double(numberOfPages)
+      })
+        .dispose()
       
       s.pageImage_
         .map { return NSImage(cgimage: $0) }
@@ -71,11 +78,22 @@ class ViewController: NSViewController {
       
       s.pageNumber_.map { $0 > 1 }
         .bind(to:prevPageButton.rx.isEnabled).disposed(by: s.disposeBag)
-      
       Observable.combineLatest(s.pageNumber_, s.numberOfPages_) { pageNumber, numberOfPages in
         return pageNumber < numberOfPages
         }
         .bind(to: nextPageButton.rx.isEnabled).disposed(by: s.disposeBag)
+      
+      s.pageNumber_.distinctUntilChanged()
+        .map { Double($0) }
+        .bind(to: pageNumberSlider.rx.value)
+        .disposed(by: s.disposeBag)
+      pageNumberSlider.rx.value.distinctUntilChanged()
+        .map { Int($0) }
+        .subscribe(onNext: { pageNumber in
+          print(pageNumber)
+          s.gotoPage(pageNumber)
+        })
+        .disposed(by: s.disposeBag)
     }
   }
   
