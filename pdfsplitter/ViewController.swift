@@ -16,7 +16,7 @@ enum VCError : Error {
   case CouldntOpenPdfToRead(url: URL)
 //  case FailedToCreateGraphicsContext
 //  case FailedToCropImage
-//  case FailedToOpenPage(pageNum: Int)
+  case FailedToOpenPage(pageNum: Int)
 //  case FailedToRenderImage
   case NoCurrentDocument
 //  case PageOutOfRange(pageNum: Int)
@@ -98,7 +98,6 @@ class ViewController: NSViewController {
       pageNumberSlider.rx.value.distinctUntilChanged()
         .map { Int($0) }
         .subscribe(onNext: { pageNumber in
-          print(pageNumber)
           s.gotoPage(pageNumber)
         })
         .disposed(by: s.disposeBag)
@@ -165,26 +164,33 @@ class ViewController: NSViewController {
   }
   
   @IBAction func splitPushed(sender: NSButton) {
-    //    guard document != nil else {
-    //      return
-    //    }
-    //
-    //    let dialog = NSSavePanel()
-    //    dialog.title = "Save the .pdf file"
-    //    dialog.showsResizeIndicator = true
-    //    dialog.showsHiddenFiles = false
-    //    dialog.canCreateDirectories = true
-    //    dialog.allowedFileTypes = ["pdf"]
-    //
-    //    if dialog.runModal() != NSModalResponseOK {
-    //      return
-    //    }
-    //
-    //    guard let url = dialog.url else {
-    //      return
-    //    }
-    //
-    //    try! splitCurrentDocument(url)
+    guard let splitter = splitter else {
+      return
+    }
+    
+    let dialog = NSSavePanel()
+    dialog.title = "Save the .pdf file"
+    dialog.showsResizeIndicator = true
+    dialog.showsHiddenFiles = false
+    dialog.canCreateDirectories = true
+    dialog.allowedFileTypes = ["pdf"]
+    
+    if dialog.runModal() != NSModalResponseOK {
+      return
+    }
+    
+    guard let url = dialog.url else {
+      return
+    }
+    
+    splitter.split(destUrl: url)
+      .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+      .subscribe(onNext: { pageNum in
+      }, onError: { error in
+        print(error)
+      }, onCompleted: {
+        print("COMPLETED CONVERSION")
+      })
   }
   
   //  func splitCurrentDocument(_ destUrl: URL) throws {

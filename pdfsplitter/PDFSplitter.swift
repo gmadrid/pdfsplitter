@@ -104,4 +104,53 @@ class PDFSplitter {
       pageNumber__.value = pageNumber__.value - 1
     }
   }
+  
+  /** 
+   * Return value will indicate page number currently processed.
+   * This is useful for a status bar or similar.
+   * Observable will send Completed when all pages are rendered.
+   * Observable will send Error on errors.
+   */
+  func split(destUrl: URL) -> Observable<Int> {
+    return Observable.combineLatest(pdf_.take(1), numberOfPages_.take(1)) { pdf, numberOfPages -> (CGPDFDocument, Int, CGContext) in
+      // TODO get rid of these exclamation points.
+      let firstPage = pdf.page(at: 1)!
+      let mediaBox = firstPage.getBoxRect(.mediaBox)
+      var docBox = CGRect(origin: mediaBox.origin, size: CGSize(width: mediaBox.size.width / 2, height: mediaBox.size.height))
+      
+      // TODO another !
+      let context = CGContext(destUrl as CFURL, mediaBox: &docBox, nil)!
+      
+      return (pdf, numberOfPages, context)
+      }
+      .flatMap { (pdf, numberOfPages, context) in
+        return Observable.range(start: 1, count: numberOfPages)
+          .do(onNext: { pageNum in
+            // Exclamation points!
+            let page = pdf.page(at: pageNum)!
+            
+            let image = PDFSplitter.makeImageForPage(page)!
+            let leftImage = PDFSplitter.makeLeftImageFromImage(image)!
+            let rightImage = PDFSplitter.makeRightImageFromImage(image)!
+            
+            let leftPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: leftImage.width, height: leftImage.height))
+            let leftPageDict: [String: Any] = [
+              kCGPDFContextMediaBox as String: leftPageRect
+            ]
+            context.beginPDFPage(leftPageDict as CFDictionary)
+            context.draw(leftImage, in: leftPageRect)
+            context.endPDFPage()
+            
+            let rightPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: rightImage.width, height: rightImage.height))
+            let rightPageDict: [String: Any] = [
+              kCGPDFContextMediaBox as String: rightPageRect
+            ]
+            context.beginPDFPage(rightPageDict as CFDictionary)
+            context.draw(rightImage, in: leftPageRect)
+            context.endPDFPage()
+          }, onCompleted: {
+            context.closePDF()
+          })
+    }
+  }
 }
