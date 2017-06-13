@@ -41,6 +41,7 @@ class ViewController: NSViewController {
   @IBOutlet var prevPageButton: NSButton!
   @IBOutlet var openFileButton: NSButton!
   @IBOutlet var splitButton: NSButton!
+  @IBOutlet var progressBar: NSProgressIndicator!
 
   var disposeBag = DisposeBag()
   var processing = BehaviorSubject(value: false)
@@ -53,11 +54,13 @@ class ViewController: NSViewController {
       
       guard let s = splitter else { return }
       
-      // Set the max/min values for the slider.
+      // Set the max/min values for the slider and progress bar.
       // (Dispose immediately. We're just unwrapping this to set these initial values.)
       s.numberOfPages_.subscribe(onNext: { [weak self] numberOfPages in
         self?.pageNumberSlider.minValue = 1.0
         self?.pageNumberSlider.maxValue = Double(numberOfPages)
+        self?.progressBar.minValue = 1.0
+        self?.progressBar.maxValue = Double(numberOfPages)
       })
         .dispose()
       
@@ -106,12 +109,16 @@ class ViewController: NSViewController {
         })
         .disposed(by: s.disposeBag)
       
-      // Disable the split button and open file button while processing a split.
+      // Based on whether split processing is happening.
+      // - show/hide split button
+      // - enable/disable open file button
+      // - hide/show progress indicator
       let p = processing
         .map { !$0 }
         .asDriver(onErrorJustReturn: false)
-      p.drive(splitButton.rx.isEnabled).disposed(by: disposeBag)
+      processing.asDriver(onErrorJustReturn: false).drive(splitButton.rx.isHidden).disposed(by: disposeBag)
       p.drive(openFileButton.rx.isEnabled).disposed(by: disposeBag)
+      p.drive(progressBar.rx.isHidden).disposed(by: disposeBag)
     }
   }
   
@@ -196,15 +203,26 @@ class ViewController: NSViewController {
     
     let url = URL(string: "file:///Users/gmadrid/Desktop/Sonata-test.pdf")!
     
+    // TODO: see if NSProgressBar has better RxCocoa support.
     processing.onNext(true)
-    splitter.split(destUrl: url)
+    progressBar.startAnimation(nil)
+    progressBar.doubleValue = 1
+    // TODO: when you make this a driver here, what happens to your errors? Can you get them out somehow.
+    let split = splitter.split(destUrl: url)
       .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
-      .subscribe(onNext: { pageNum in
-      }, onError: { [weak self] error in
-        print(error)
-        self?.processing.onNext(false)
+      .asDriver(onErrorJustReturn: 0)
+
+    split
+      .drive(onNext: {
+        pageNum in self.progressBar.doubleValue = Double(pageNum)
+      }, onCompleted: {
+        self.progressBar.stopAnimation(nil)
+      })
+      .disposed(by: disposeBag)
+    
+    split
+      .drive(onNext: { pageNum in
       }, onCompleted: { [weak self] in
-        print("COMPLETED CONVERSION")
         self?.processing.onNext(false)
       })
       .disposed(by: splitter.disposeBag)
