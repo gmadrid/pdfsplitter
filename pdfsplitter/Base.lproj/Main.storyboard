@@ -766,7 +766,7 @@
                                 </connections>
                             </button>
                             <slider verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aeG-we-5bb" userLabel="pageNumberSlider">
-                                <rect key="frame" x="46" y="670" width="761" height="19"/>
+                                <rect key="frame" x="46" y="670" width="761" height="21"/>
                                 <sliderCell key="cell" enabled="NO" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="7SB-9q-rB2"/>
                             </slider>
                         </subviews>
@@ -810,6 +810,7 @@
                         <outlet property="filenameField" destination="toG-RC-7JN" id="nbl-7t-DOJ"/>
                         <outlet property="leftImageView" destination="o3u-0x-f8w" id="ijo-pc-LT0"/>
                         <outlet property="nextPageButton" destination="7HR-CJ-5v5" id="9id-Ab-xBB"/>
+                        <outlet property="openFileButton" destination="1X1-Af-rPe" id="5Mt-IV-w1u"/>
                         <outlet property="originalImageView" destination="bHO-Kk-v3i" id="YzS-ET-oE6"/>
                         <outlet property="pageNumberField" destination="5vn-WL-7fj" id="EfC-85-XjL"/>
                         <outlet property="pageNumberSlider" destination="aeG-we-5bb" id="szR-hQ-Rfc"/>

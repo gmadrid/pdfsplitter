@@ -39,7 +39,11 @@ class ViewController: NSViewController {
   
   @IBOutlet var nextPageButton: NSButton!
   @IBOutlet var prevPageButton: NSButton!
+  @IBOutlet var openFileButton: NSButton!
   @IBOutlet var splitButton: NSButton!
+
+  var disposeBag = DisposeBag()
+  var processing = BehaviorSubject(value: false)
   
   // TODO: make this a sequence, OR make this document-based.
   var splitter: PDFSplitter? {
@@ -101,6 +105,13 @@ class ViewController: NSViewController {
           s.gotoPage(pageNumber)
         })
         .disposed(by: s.disposeBag)
+      
+      // Disable the split button and open file button while processing a split.
+      let p = processing
+        .map { !$0 }
+        .asDriver(onErrorJustReturn: false)
+      p.drive(splitButton.rx.isEnabled).disposed(by: disposeBag)
+      p.drive(openFileButton.rx.isEnabled).disposed(by: disposeBag)
     }
   }
   
@@ -168,68 +179,36 @@ class ViewController: NSViewController {
       return
     }
     
-    let dialog = NSSavePanel()
-    dialog.title = "Save the .pdf file"
-    dialog.showsResizeIndicator = true
-    dialog.showsHiddenFiles = false
-    dialog.canCreateDirectories = true
-    dialog.allowedFileTypes = ["pdf"]
+//    let dialog = NSSavePanel()
+//    dialog.title = "Save the .pdf file"
+//    dialog.showsResizeIndicator = true
+//    dialog.showsHiddenFiles = false
+//    dialog.canCreateDirectories = true
+//    dialog.allowedFileTypes = ["pdf"]
+//    
+//    if dialog.runModal() != NSModalResponseOK {
+//      return
+//    }
+//    
+//    guard let url = dialog.url else {
+//      return
+//    }
     
-    if dialog.runModal() != NSModalResponseOK {
-      return
-    }
+    let url = URL(string: "file:///Users/gmadrid/Desktop/Sonata-test.pdf")!
     
-    guard let url = dialog.url else {
-      return
-    }
-    
+    processing.onNext(true)
     splitter.split(destUrl: url)
       .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
       .subscribe(onNext: { pageNum in
-      }, onError: { error in
+      }, onError: { [weak self] error in
         print(error)
-      }, onCompleted: {
+        self?.processing.onNext(false)
+      }, onCompleted: { [weak self] in
         print("COMPLETED CONVERSION")
+        self?.processing.onNext(false)
       })
+      .disposed(by: splitter.disposeBag)
   }
-  
-  //  func splitCurrentDocument(_ destUrl: URL) throws {
-  //    let doc = try checkForCurrentDocument()
-  //
-  //    guard let firstPage = doc.page(at: 1) else {
-  //      return
-  //    }
-  //    let mediaBox = firstPage.getBoxRect(.mediaBox)
-  //    var docBox = CGRect(origin: mediaBox.origin, size: CGSize(width: mediaBox.size.width / 2, height: mediaBox.size.height))
-  //
-  //    guard let context = CGContext(destUrl as CFURL, mediaBox: &docBox, nil) else {
-  //      return
-  //    }
-  //
-  //    for pageNum in 1...doc.numberOfPages {
-  //      let page = try getPageFromDocument(pageNum, fromDoc: doc)
-  //
-  //      let image = try imageForPage(page)
-  //      let leftImage = try leftImageForImage(image)
-  //      let rightImage = try rightImageForImage(image)
-  //
-  //      let leftPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: leftImage.width, height: leftImage.height))
-  //      let leftPageDict: [String:Any] = [
-  //        kCGPDFContextMediaBox as String: leftPageRect
-  //      ]
-  //      context.beginPDFPage(leftPageDict as CFDictionary)
-  //      context.draw(leftImage, in: leftPageRect)
-  //      context.endPage()
-  //
-  //      let rightPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: rightImage.width, height: rightImage.height))
-  //      let rightPageDict: [String:Any] = [
-  //        kCGPDFContextMediaBox as String: rightPageRect
-  //      ]
-  //      context.beginPDFPage(rightPageDict as CFDictionary)
-  //      context.draw(rightImage, in: rightPageRect)
-  //      context.endPage()
-  //    }
-  //  }
   
   func openFile(_ fileURL: URL) throws {
     closeFile();
