@@ -12,16 +12,6 @@ import CoreImage
 import RxCocoa
 import RxSwift
 
-enum VCError : Error {
-  case CouldntOpenPdfToRead(url: URL)
-  case FailedToCreateGraphicsContext
-  case FailedToCropImage
-  case FailedToOpenPage(pageNum: Int)
-  case FailedToRenderImage
-  case NoCurrentDocument
-//  case PageOutOfRange(pageNum: Int)
-}
-
 extension NSImage {
   convenience init?(cgimage: CGImage?) {
     guard let cgimage = cgimage else { return nil }
@@ -252,7 +242,7 @@ class ViewController: NSViewController {
   
   func requireSplitter() throws -> PDFSplitter {
     guard let s = splitter else {
-      throw VCError.NoCurrentDocument
+      throw Errors.NoCurrentDocument
     }
     return s
   }

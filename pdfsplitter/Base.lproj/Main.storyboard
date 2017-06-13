@@ -68,7 +68,7 @@
                                         </menuItem>
                                         <menuItem title="Open…" keyEquivalent="o" id="IAo-SY-fd9">
                                             <connections>
-                                                <action selector="openDocument:" target="Ady-hI-5gd" id="bVn-NM-KNZ"/>
+                                                <action selector="openNewWindowWithSender:" target="Voe-Tx-rLC" id="muP-KD-NAp"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Open Recent" id="tXI-mr-wws">
@@ -684,14 +684,14 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="pdfsplitter" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="960" height="734"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1010" height="735"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="h3z-fj-LFj">
-                                <rect key="frame" x="40" y="49" width="880" height="665"/>
+                                <rect key="frame" x="40" y="49" width="930" height="666"/>
                                 <subviews>
                                     <stackView distribution="fill" orientation="horizontal" alignment="firstBaseline" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hxW-Eg-XZ7">
-                                        <rect key="frame" x="0.0" y="643" width="880" height="22"/>
+                                        <rect key="frame" x="0.0" y="644" width="930" height="22"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LdV-70-9z1">
                                                 <rect key="frame" x="-2" y="3" width="63" height="17"/>
@@ -702,7 +702,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField identifier="filenameField" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="toG-RC-7JN">
-                                                <rect key="frame" x="67" y="0.0" width="722" height="22"/>
+                                                <rect key="frame" x="67" y="0.0" width="772" height="22"/>
                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="IVs-co-FOM">
                                                     <font key="font" metaFont="system"/>
                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -710,7 +710,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1X1-Af-rPe">
-                                                <rect key="frame" x="791" y="-7" width="95" height="32"/>
+                                                <rect key="frame" x="841" y="-7" width="95" height="32"/>
                                                 <buttonCell key="cell" type="push" title="Open file" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="mLc-VB-46G">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -732,10 +732,10 @@
                                         </customSpacing>
                                     </stackView>
                                     <stackView distribution="fill" orientation="horizontal" alignment="firstBaseline" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gHt-51-eCj">
-                                        <rect key="frame" x="0.0" y="611" width="880" height="24"/>
+                                        <rect key="frame" x="0.0" y="619" width="930" height="17"/>
                                         <subviews>
                                             <textField identifier="pageNumberField" horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5vn-WL-7fj">
-                                                <rect key="frame" x="-2" y="7" width="119" height="17"/>
+                                                <rect key="frame" x="-2" y="0.0" width="54" height="17"/>
                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="G7D-Zo-xAa">
                                                     <font key="font" metaFont="system"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -743,7 +743,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aeG-we-5bb" userLabel="pageNumberSlider">
-                                                <rect key="frame" x="121" y="5" width="761" height="19"/>
+                                                <rect key="frame" x="56" y="-2" width="876" height="19"/>
                                                 <sliderCell key="cell" enabled="NO" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="7SB-9q-rB2"/>
                                             </slider>
                                         </subviews>
@@ -757,11 +757,11 @@
                                         </customSpacing>
                                     </stackView>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bHO-Kk-v3i" userLabel="originalView">
-                                        <rect key="frame" x="-3" y="317" width="886" height="289"/>
+                                        <rect key="frame" x="22" y="321" width="886" height="293"/>
                                         <imageCell key="cell" selectable="YES" editable="YES" enabled="NO" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" id="ShW-d9-MMY"/>
                                     </imageView>
                                     <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="upf-Gy-C4i">
-                                        <rect key="frame" x="403" y="291" width="74" height="21"/>
+                                        <rect key="frame" x="428" y="295" width="74" height="21"/>
                                         <subviews>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fqR-Zb-R8D" userLabel="prevPage">
                                                 <rect key="frame" x="-6" y="-7" width="45" height="32"/>
@@ -797,14 +797,14 @@
                                         </customSpacing>
                                     </stackView>
                                     <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UiQ-M2-2Jg">
-                                        <rect key="frame" x="0.0" y="0.0" width="880" height="283"/>
+                                        <rect key="frame" x="25" y="0.0" width="880" height="287"/>
                                         <subviews>
                                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="o3u-0x-f8w" userLabel="splitView1">
-                                                <rect key="frame" x="-3" y="-3" width="442" height="289"/>
+                                                <rect key="frame" x="-3" y="-3" width="442" height="293"/>
                                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" id="CQZ-hd-CYh"/>
                                             </imageView>
                                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="d9e-b8-CUA" userLabel="splitView2">
-                                                <rect key="frame" x="441" y="-3" width="442" height="289"/>
+                                                <rect key="frame" x="441" y="-3" width="442" height="293"/>
                                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" id="MPY-ia-FDR"/>
                                             </imageView>
                                         </subviews>
@@ -842,13 +842,13 @@
                                 </customSpacing>
                             </stackView>
                             <stackView distribution="fill" orientation="horizontal" alignment="bottom" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OoY-Cn-8lC">
-                                <rect key="frame" x="40" y="20" width="880" height="21"/>
+                                <rect key="frame" x="40" y="20" width="930" height="21"/>
                                 <subviews>
                                     <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="gtO-ai-Udp">
-                                        <rect key="frame" x="0.0" y="-1" width="816" height="20"/>
+                                        <rect key="frame" x="0.0" y="-1" width="866" height="20"/>
                                     </progressIndicator>
                                     <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EBf-hp-1TC">
-                                        <rect key="frame" x="818" y="-7" width="68" height="32"/>
+                                        <rect key="frame" x="868" y="-7" width="68" height="32"/>
                                         <buttonCell key="cell" type="push" title="Split" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MHk-2S-2xe">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>

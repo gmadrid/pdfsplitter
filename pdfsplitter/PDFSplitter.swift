@@ -24,7 +24,7 @@ class PDFSplitter {
   
   convenience init(url: URL) throws {
     guard let document = CGPDFDocument(url as CFURL) else {
-      throw VCError.CouldntOpenPdfToRead(url: url)
+      throw Errors.CouldntOpenPdfToRead(url: url)
     }
     try self.init(pdf: document)
   }
@@ -116,13 +116,13 @@ class PDFSplitter {
     return Observable.combineLatest(pdf_.take(1), numberOfPages_.take(1)) { pdf, numberOfPages -> (CGPDFDocument, Int, CGContext) in
       // TODO get rid of these exclamation points.
       guard let firstPage = pdf.page(at: 1) else {
-        throw VCError.FailedToOpenPage(pageNum: 1)
+        throw Errors.FailedToOpenPage(pageNum: 1)
       }
       let mediaBox = firstPage.getBoxRect(.mediaBox)
       var docBox = CGRect(origin: mediaBox.origin, size: CGSize(width: mediaBox.size.width / 2, height: mediaBox.size.height))
       
       guard let context = CGContext(destUrl as CFURL, mediaBox: &docBox, nil) else {
-        throw VCError.FailedToCreateGraphicsContext
+        throw Errors.FailedToCreateGraphicsContext
       }
       
       return (pdf, numberOfPages, context)
@@ -131,17 +131,17 @@ class PDFSplitter {
         return Observable.range(start: 1, count: numberOfPages)
           .do(onNext: { pageNum in
             guard let page = pdf.page(at: pageNum) else {
-              throw VCError.FailedToOpenPage(pageNum: pageNum)
+              throw Errors.FailedToOpenPage(pageNum: pageNum)
             }
             
             guard let image = PDFSplitter.makeImageForPage(page) else {
-              throw VCError.FailedToRenderImage
+              throw Errors.FailedToRenderImage
             }
             guard let leftImage = PDFSplitter.makeLeftImageFromImage(image) else {
-              throw VCError.FailedToCropImage
+              throw Errors.FailedToCropImage
             }
             guard let rightImage = PDFSplitter.makeRightImageFromImage(image) else {
-              throw VCError.FailedToCropImage
+              throw Errors.FailedToCropImage
             }
             
             let leftPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: leftImage.width, height: leftImage.height))

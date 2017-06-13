@@ -13,6 +13,7 @@
 		C77DEA6D1EE7418400A5B714 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77DEA6C1EE7418400A5B714 /* ViewController.swift */; };
 		C77DEA6F1EE7418400A5B714 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C77DEA6E1EE7418400A5B714 /* Assets.xcassets */; };
 		C77DEA721EE7418400A5B714 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C77DEA701EE7418400A5B714 /* Main.storyboard */; };
+		C789D3BC1EF0A2A20067815A /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = C789D3BB1EF0A2A20067815A /* Errors.swift */; };
 		DAA804C204FF33B74BA0CB97 /* Pods_pdfsplitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1137E8346E8F071387A90D50 /* Pods_pdfsplitter.framework */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +27,7 @@
 		C77DEA6E1EE7418400A5B714 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C77DEA711EE7418400A5B714 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C77DEA731EE7418400A5B714 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C789D3BB1EF0A2A20067815A /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		CAA528DDFCCBE39CE29582EF /* Pods-pdfsplitter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdfsplitter.release.xcconfig"; path = "Pods/Target Support Files/Pods-pdfsplitter/Pods-pdfsplitter.release.xcconfig"; sourceTree = "<group>"; };
 		CC6EEFEE115FB216C0361367 /* Pods-pdfsplitter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdfsplitter.debug.xcconfig"; path = "Pods/Target Support Files/Pods-pdfsplitter/Pods-pdfsplitter.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -87,6 +89,7 @@
 				C77DEA6E1EE7418400A5B714 /* Assets.xcassets */,
 				C77DEA701EE7418400A5B714 /* Main.storyboard */,
 				C77DEA731EE7418400A5B714 /* Info.plist */,
+				C789D3BB1EF0A2A20067815A /* Errors.swift */,
 			);
 			path = pdfsplitter;
 			sourceTree = "<group>";
@@ -214,6 +217,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C789D3BC1EF0A2A20067815A /* Errors.swift in Sources */,
 				C77DEA6D1EE7418400A5B714 /* ViewController.swift in Sources */,
 				C73135ED1EE98FD8006FAE15 /* PDFSplitter.swift in Sources */,
 				C77DEA6B1EE7418400A5B714 /* AppDelegate.swift in Sources */,
