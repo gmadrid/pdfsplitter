@@ -1,10 +1,5 @@
 #### TODO
-* Move processing to other threads
-* Have progress bar for processing
 * Put stuff in Stack views where useful.
-
-* Move all of the pdf handling out of the VC
 
 * Detect center of page
 * Figure out what to do with pages like Sonata page 30.
-
