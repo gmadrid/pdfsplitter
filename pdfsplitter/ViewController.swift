@@ -186,22 +186,22 @@ class ViewController: NSViewController {
       return
     }
     
-//    let dialog = NSSavePanel()
-//    dialog.title = "Save the .pdf file"
-//    dialog.showsResizeIndicator = true
-//    dialog.showsHiddenFiles = false
-//    dialog.canCreateDirectories = true
-//    dialog.allowedFileTypes = ["pdf"]
-//    
-//    if dialog.runModal() != NSModalResponseOK {
-//      return
-//    }
-//    
-//    guard let url = dialog.url else {
-//      return
-//    }
+    let dialog = NSSavePanel()
+    dialog.title = "Save the .pdf file"
+    dialog.showsResizeIndicator = true
+    dialog.showsHiddenFiles = false
+    dialog.canCreateDirectories = true
+    dialog.allowedFileTypes = ["pdf"]
     
-    let url = URL(string: "file:///Users/gmadrid/Desktop/Sonata-test.pdf")!
+    if dialog.runModal() != NSModalResponseOK {
+      return
+    }
+    
+    guard let url = dialog.url else {
+      return
+    }
+    
+//    let url = URL(string: "file:///Users/gmadrid/Desktop/Sonata-test.pdf")!
     
     // TODO: see if NSProgressBar has better RxCocoa support.
     processing.onNext(true)
