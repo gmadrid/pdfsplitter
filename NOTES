@@ -1,5 +1,9 @@
 #### TODO
 * Put stuff in Stack views where useful.
+* Find out how to expand items to fill space while keeping other items natural size.
+* Errors from split function
+* Errors everywhere
+* Initialize name of output file.
 
 * Detect center of page
 * Figure out what to do with pages like Sonata page 30.
