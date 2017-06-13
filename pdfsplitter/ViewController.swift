@@ -215,8 +215,14 @@ class ViewController: NSViewController {
     split
       .drive(onNext: {
         pageNum in self.progressBar.doubleValue = Double(pageNum)
-      }, onCompleted: {
-        self.progressBar.stopAnimation(nil)
+      }, onCompleted: { [weak self] in
+        self?.progressBar.stopAnimation(nil)
+        
+        // It feels very weird to put this here.
+        guard let window = self?.view.window else { return }
+        let alert = NSAlert()
+        alert.messageText = "Split complete"
+        alert.beginSheetModal(for: window, completionHandler: { _ in })
       })
       .disposed(by: disposeBag)
     
