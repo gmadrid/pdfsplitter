@@ -60,6 +60,7 @@ class PDFSplitter {
     }
   }
 
+  // TODO: Have this throw on failure.
   private static func makeImageForPage(_ page: CGPDFPage) -> CGImage? {
     let mediaBox = page.getBoxRect(.mediaBox)
     let destBox = CGRect(origin: CGPoint.zero, size: mediaBox.size)
@@ -114,24 +115,34 @@ class PDFSplitter {
   func split(destUrl: URL) -> Observable<Int> {
     return Observable.combineLatest(pdf_.take(1), numberOfPages_.take(1)) { pdf, numberOfPages -> (CGPDFDocument, Int, CGContext) in
       // TODO get rid of these exclamation points.
-      let firstPage = pdf.page(at: 1)!
+      guard let firstPage = pdf.page(at: 1) else {
+        throw VCError.FailedToOpenPage(pageNum: 1)
+      }
       let mediaBox = firstPage.getBoxRect(.mediaBox)
       var docBox = CGRect(origin: mediaBox.origin, size: CGSize(width: mediaBox.size.width / 2, height: mediaBox.size.height))
       
-      // TODO another !
-      let context = CGContext(destUrl as CFURL, mediaBox: &docBox, nil)!
+      guard let context = CGContext(destUrl as CFURL, mediaBox: &docBox, nil) else {
+        throw VCError.FailedToCreateGraphicsContext
+      }
       
       return (pdf, numberOfPages, context)
       }
       .flatMap { (pdf, numberOfPages, context) in
         return Observable.range(start: 1, count: numberOfPages)
           .do(onNext: { pageNum in
-            // Exclamation points!
-            let page = pdf.page(at: pageNum)!
+            guard let page = pdf.page(at: pageNum) else {
+              throw VCError.FailedToOpenPage(pageNum: pageNum)
+            }
             
-            let image = PDFSplitter.makeImageForPage(page)!
-            let leftImage = PDFSplitter.makeLeftImageFromImage(image)!
-            let rightImage = PDFSplitter.makeRightImageFromImage(image)!
+            guard let image = PDFSplitter.makeImageForPage(page) else {
+              throw VCError.FailedToRenderImage
+            }
+            guard let leftImage = PDFSplitter.makeLeftImageFromImage(image) else {
+              throw VCError.FailedToCropImage
+            }
+            guard let rightImage = PDFSplitter.makeRightImageFromImage(image) else {
+              throw VCError.FailedToCropImage
+            }
             
             let leftPageRect = CGRect(origin: CGPoint.zero, size: CGSize(width: leftImage.width, height: leftImage.height))
             let leftPageDict: [String: Any] = [

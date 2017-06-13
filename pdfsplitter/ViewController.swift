@@ -14,10 +14,10 @@ import RxSwift
 
 enum VCError : Error {
   case CouldntOpenPdfToRead(url: URL)
-//  case FailedToCreateGraphicsContext
-//  case FailedToCropImage
+  case FailedToCreateGraphicsContext
+  case FailedToCropImage
   case FailedToOpenPage(pageNum: Int)
-//  case FailedToRenderImage
+  case FailedToRenderImage
   case NoCurrentDocument
 //  case PageOutOfRange(pageNum: Int)
 }
